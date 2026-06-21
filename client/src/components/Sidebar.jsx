@@ -1,8 +1,26 @@
 //import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link ,useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    // Optional: Confirm action with user
+    const confirmSignOut = window.confirm("Are you sure you want to sign out?");
+    if (!confirmSignOut) return;
+
+    // Clear saved session keys
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("isLoggedIn");
+
+    // Close mobile drawer menu overlay if open
+    onClose();
+
+    // Redirect the user back to the login screen route
+    navigate("/");
+  };
   const menuItems = {
     student: [
       { path: '/student/dashboard', label: 'Dashboard' },
@@ -79,7 +97,37 @@ const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
           </ul>
         </nav>
 
+       
         <hr className='w-full text-gray-400'/>
+       
+        <div className='pt-10 flex flex-col gap-4'>
+           {/* User Profile Info block */}
+            <div className="flex items-center gap-3 px-2">
+            <div className="w-10 h-10 rounded-full bg-white text-blue-900 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
+              AD
+            </div>
+            <div className="overflow-hidden">
+              <h4 className="font-semibold text-sm truncate">Amina Diallo</h4>
+              <p className="text-xs text-blue-200 truncate">Computer Science · Year 3</p>
+            </div>
+          </div>
+
+          {/* Functional Sign Out Button Element */}
+         <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-200 hover:bg-red-600/20 hover:text-red-300 transition-all text-left group"
+          >
+            <svg 
+              className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Sign Out</span>
+          </button>
+        </div>
       </aside>
     </>
   )

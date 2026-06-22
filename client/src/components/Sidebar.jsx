@@ -58,7 +58,7 @@ const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed md:relative w-72 min-h-screen bg-blue-900 text-white px-6 py-8 z-40 transition-transform duration-300 md:translate-x-0 ${
+      <aside className={`fixed md:sticky md:top-0 w-72 h-screen overflow-y-auto bg-blue-900 text-white px-6 py-8 z-40 transition-transform duration-300 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } md:block`}>
         <div className="mb-8 flex items-center justify-between">

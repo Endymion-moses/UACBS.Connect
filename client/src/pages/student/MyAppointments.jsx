@@ -1,25 +1,29 @@
 //import React from 'react'
 
-import  { useState } from 'react';
-import { APPOINTMENTS } from '../../services/appointmentServices';
-import { TABS } from '../../services/appointmentServices';
+import { useState} from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { APPOINTMENTS, TABS } from '../../services/appointmentServices';
 
 
 
 export default function AppointmentDashboard() {
   // 2. Track the active tab state
-  const [appointments, setAppointments] = useState(APPOINTMENTS)
-  const [activeTab, setActiveTab] = useState('All');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [appointments, setAppointments] = useState(APPOINTMENTS);
+  const activeTab = searchParams.get('tab') || 'All';
+
+
+
 
    const handleCancel = (id) => {
-    setAppointments(prev => 
+    setAppointments(prev =>
       prev.map(app => app.id === id ? { ...app, status: 'Cancelled' } : app)
     );
   };
 
   // 3. Filter data based on active tab
-  const filteredAppointments = activeTab === 'All' 
-    ? appointments 
+  const filteredAppointments = activeTab === 'All'
+    ? appointments
     : appointments.filter(app => app.status === activeTab);
 
   return (
@@ -33,10 +37,10 @@ export default function AppointmentDashboard() {
           return (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setSearchParams({ tab })}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-                isActive 
-                  ? 'bg-blue-900 text-white' 
+                isActive
+                  ? 'bg-blue-900 text-white'
                   : 'bg-white  hover:bg-slate-100 border border-slate-200'
               }`}
             >
@@ -66,19 +70,19 @@ export default function AppointmentDashboard() {
                   </div>
                 </div>
               </div>
-              
+
               <div className='flex flex-col items-center justify-center gap-4'>
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                   app.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' :
-                  app.status === 'Pending' ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'
+                  app.status === 'Pending' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
                 }`}>
                   {app.status}
                 </span>
 
                  {app.status === 'Pending' && (
-                <button 
+                <button
                   onClick={() => handleCancel(app.id)}
-                  className="text-xs text-red-500 border border-gray-100 rounded-full bg-gray-100 
+                  className="text-xs text-red-500 border border-gray-100 rounded-full bg-gray-100
                   p-2 hover:text-rose-700 font-medium flex items-center gap-1 mt-1 transition-colors"
                 >
                   ✕ Cancel

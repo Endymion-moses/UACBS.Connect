@@ -1,11 +1,36 @@
 //import React from 'react'
-import { items } from "../../assets/assets"
+import { assets } from "../../assets/assets"
 import { Link } from "react-router-dom"
-import { APPOINTMENTS } from '../../services/appointmentServices';
+import { countByStatus, countUpcoming } from '../../services/appointmentServices';
 import {LECTURERS} from '../../services/appointmentServices'
+import DashboardStats from "../../components/DashboardStats";
+import useAppointment from "../../hooks/useAppointment";
 
 const StudentDashboard = () => {
-  const recentAppointments = APPOINTMENTS.slice(0, 4);
+  const { appointments } = useAppointment();
+  const recentAppointments = appointments.slice(0, 4);
+  const studentStats = [
+    {
+      image: assets.upcoming_icon,
+      name: "UPCOMING",
+      count: countUpcoming(appointments),
+    },
+    {
+      image: assets.pending_icon,
+      name: "PENDING",
+      count: countByStatus(appointments, "Pending"),
+    },
+    {
+      image: assets.comppleted_icon,
+      name: "COMPLETED",
+      count: countByStatus(appointments, "Completed"),
+    },
+    {
+      image: assets.total_icon,
+      name: "TOTAL",
+      count: appointments.length,
+    },
+  ];
 
   return (
     <div className="p-5 flex flex-col">
@@ -23,19 +48,7 @@ const StudentDashboard = () => {
       </div>
 
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {items.map((item, index) => (
-          <div key={index} className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-xl">
-            <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-blue-50">
-              <img src={item.image} alt={item.name} className="h-8 w-8 " />
-            </div>
-            <div>
-              <p className="  uppercase  ">{item.name}</p>
-              <p className="mt-2 text-lg font-bold ">{item.count}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <DashboardStats stats={studentStats} />
 
 
       <div className="flex flex-col lg:flex-row gap-3 ">

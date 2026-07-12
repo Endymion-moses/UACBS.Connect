@@ -46,7 +46,7 @@ const Notifications = ({ item, onMarkAsRead = () => {} }) => {
     <div
       onClick={() => !isRead && onMarkAsRead(id)}
       className={`group flex items-start gap-4 p-5 bg-white border border-slate-100 rounded-2xl transition-all duration-200 shadow-sm ${
-        !isRead ? 'cursor-pointer hover:border-slate-300' : 'opacity-85'
+        !isRead ? 'cursor-pointer hover:bg-gray-400' : 'opacity-85'
       }`}
     >
       {/* Dynamic Status Icon Circle */}

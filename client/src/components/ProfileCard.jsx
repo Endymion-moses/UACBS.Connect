@@ -38,13 +38,7 @@ const ProfileCard = ({ role = 'student', initialData }) => {
   };
 
   return (
-    <div>
-
-       <div className='flex flex-col pl-33 pb-5'>
-         <h1 className='font-bold text-2xl'>My Profile</h1>
-       <p className='text-gray-400'>Manage your personal information</p>
-       </div>
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
 
       {/* Blue Header Banner */}
       <div className="bg-blue-900 h-32 relative px-8 flex items-end">
@@ -191,7 +185,6 @@ const ProfileCard = ({ role = 'student', initialData }) => {
           </button>
         </div>
       </form>
-    </div>
     </div>
   );
 };

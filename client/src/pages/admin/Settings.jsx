@@ -1,8 +1,12 @@
 //import React from 'react'
 
+import NotImplemented from "../../components/NotImplemented"
+
 const Settings = () => {
   return (
-    <div>Settings</div>
+    <div>
+      <NotImplemented featureName="System setings"/>
+    </div>
   )
 }
 

@@ -1,8 +1,12 @@
 //import React from 'react'
 
+import NotImplemented from "../../components/NotImplemented"
+
 const Departments = () => {
   return (
-    <div>Departments</div>
+    <div>
+      <NotImplemented featureName="Departments"/>
+    </div>
   )
 }
 

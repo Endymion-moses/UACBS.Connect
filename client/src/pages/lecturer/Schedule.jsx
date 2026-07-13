@@ -1,8 +1,12 @@
 //import React from 'react'
 
+import NotImplemented from "../../components/NotImplemented"
+
 const Schedule = () => {
   return (
-    <div>Schedule</div>
+    <div>
+        <NotImplemented featureName="Schedules "/>
+    </div>
   )
 }
 

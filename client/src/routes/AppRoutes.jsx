@@ -4,6 +4,7 @@ import Login from "../pages/auth/Login";
 import StudentLayout from "../layouts/StudentLayout";
 import LecturerLayout from "../layouts/LecturerLayout";
 import AdminLayout from "../layouts/AdminLayout";
+import Register from "../pages/auth/register";
 
 // Student pages
 import StudentDashboard from "../pages/student/Dashboard";
@@ -26,10 +27,12 @@ import Departments from "../pages/admin/Departments";
 import Reports from "../pages/admin/Reports";
 import Settings from "../pages/admin/Settings";
 
+
 const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/register" element={<Register/>}/>
 
       <Route path="/student" element={<StudentLayout />}>
         <Route index element={<StudentDashboard />} />

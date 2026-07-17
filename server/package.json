@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon -r dotenv/config src/server.js",
-     "build": "npx prisma generate"
+     "build": "node --env-file=.env npx prisma generate || npx prisma generate"
   },
   "keywords": [],
   "author": "",

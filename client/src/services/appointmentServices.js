@@ -50,7 +50,14 @@ export const APPOINTMENTS = [
   { id: 5, name: 'Dr. Tawheed Nwosu', task: 'Final year project supervision', date: '2026-06-20', time: '12:00 AM', status: 'Completed', initials: 'TA' },
   { id: 6, name: 'Dr. Nadil Nwosu', task: 'Final year project supervision', date: '2026-06-20', time: '12:00 AM', status: 'Pending', initials: 'NA' },
   { id: 7, name: 'Dr. Nadil Tuwano', task: 'Final year project supervision', date: '2026-06-21', time: '12:00 AM', status: 'Pending', initials: 'NT' }
-  ];
+];
+
+export const LECTURERS = [
+  { id: 1, name: 'Dr. Amara Nwosu', department: 'Computer Science', initials: 'DA', available: true },
+  { id: 2, name: 'Prof. David Osei', department: 'Mathematics', initials: 'PD', available: true },
+  { id: 3, name: 'Dr. Kwame Mensah', department: 'Engineering', initials: 'KM', available: false },
+  { id: 4, name: 'Prof. Sarah Kimani', department: 'Business', initials: 'SK', available: true },
+];
 
 export const LECTURER_REQUESTS = [
   { id: 1, student: "Amina Diallo", studentId: "CS/2022/001", initials: "AD", topic: "Final year project supervision - need feedback on chapter 3 methodology", date: "2026-06-20", time: "10:00 AM", status: "Pending" },
@@ -63,14 +70,7 @@ export const LECTURER_REQUESTS = [
 export const TABS = ['All', 'Approved', 'Pending', 'Rejected', 'Completed', 'Cancelled'];
 
 
-export const LECTURERS = [
-  { id: '1', name: 'Dr. Amara Nwosu', department: 'Computer Science', available: true, initials: 'AN' },
-  { id: '2', name: 'Prof. David Osei', department: 'Mathematics', available: true, initials: 'DO' },
-  { id: '3', name: 'Dr. Fatima Al-Hassan', department: 'Engineering', available: false, initials: 'FA' },
- { id: '4', name: 'Dr. Kwame Mensah', department: 'Physics', available: true, initials: 'KM' },
-  { id: '5', name: 'Prof. Sarah Kimani', department: 'Business', available: true, initials: 'SK' },
-  { id: '6', name: 'Prof. Moses Kimani', department: 'Computer Science', available: true, initials: 'MK' }
-];
+
 
 export const AVAILABLE_TIMES = ['08:00 AM', '09:30 AM', '10:00 PM', '12:30 PM', '02:00 PM', '03:00 PM' , '04:00 PM' , '07:00 PM'];
 

@@ -1,8 +1,29 @@
 //import React from 'react'
+import { useState, useEffect } from "react";
 import { Link ,useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
+  const [user, setUser] = useState(null);
+
+
+
+useEffect(() => {
+    // Read the active session data we saved during the login phase
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser) {
+        setUser(JSON.parse(cachedUser));
+    }
+}, []);
+
+// Helper function to extract initials safely from the user's name
+const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0][0].toUpperCase();
+};
+
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -51,7 +72,7 @@ const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
     <>
       {/* Mobile overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-transparent z-30 md:hidden"
           onClick={onClose}
         />
@@ -78,7 +99,7 @@ const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
             </svg>
           </button>
         </div>
-         
+
         <hr className='w-full text-gray-400 p-5'/>
 
         <nav className='pb-10'>
@@ -97,30 +118,45 @@ const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
           </ul>
         </nav>
 
-       
+
         <hr className='w-full text-gray-400'/>
-       
+
         <div className='pt-10 flex flex-col gap-4'>
-           {/* User Profile Info block */}
-            <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-white text-blue-900 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
-              AD
-            </div>
-            <div className="overflow-hidden">
-              <h4 className="font-semibold text-sm truncate">Amina Diallo</h4>
-              <p className="text-xs text-blue-200 truncate">Computer Science · Year 3</p>
-            </div>
-          </div>
+    {/* User Profile Info block */}
+    <div className="flex items-center gap-3 px-2">
+
+        {/* Dynamic Avatar Initials Circle */}
+        <div className="w-10 h-10 rounded-full bg-white text-blue-900 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm select-none">
+            {getInitials(user?.fullName)}
+        </div>
+
+        <div className="overflow-hidden text-white">
+            {/* Dynamic Full Name Insertion */}
+            <h4 className="font-semibold text-sm truncate">
+                {user?.fullName || "Loading User..."}
+            </h4>
+
+            {/* Dynamic Metadata Block Mapping */}
+            <p className="text-xs text-blue-200 truncate capitalize">
+                {user?.student?.department || user?.lecturer?.department || "Academic Department"}
+                {user?.role === "STUDENT" && user?.student?.programme && ` · ${user.student.programme}`}
+                {user?.role === "LECTURER" && " · Lecturer"}
+                {user?.role === "ADMIN" && " · System Admin"}
+            </p>
+        </div>
+      </div>
+
+
 
           {/* Functional Sign Out Button Element */}
          <button
             onClick={handleSignOut}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-200 hover:bg-red-600/20 hover:text-red-300 transition-all text-left group"
           >
-            <svg 
-              className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-5 h-5 group-hover:translate-x-0.5 transition-transform"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

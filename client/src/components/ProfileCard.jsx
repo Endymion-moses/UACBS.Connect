@@ -1,199 +1,198 @@
-import { useState} from 'react';
+import { useState } from 'react';
 
 const ProfileCard = ({ role = 'student', initialData }) => {
-  // Initialize state with all possible properties
-  const [formData, setFormData] = useState({
-     fullName: initialData?.fullName || '',
-  idNumber: initialData?.idNumber || '',
-  email: initialData?.email || '',
-  phone: initialData?.phone || '',
-  department: initialData?.department || '',
-  officeLocation: initialData?.officeLocation || '',
-  yearOfStudy: initialData?.yearOfStudy || '',
-  newPassword: ''
-  });
+    const backendRole = role.toUpperCase();
 
-  // Sync state if initialData changes or loads from an API
+    
+
+    // 1. Initial State Definition Helper Function
+    const createFormState = (data) => ({
+        fullName: data?.fullName || '',
+        email: data?.email || '',
+        phone: data?.student?.phoneNumber || data?.lecturer?.phoneNumber || data?.admin?.phoneNumber || '',
+        department: data?.student?.department || data?.lecturer?.department || '',
+        programme: data?.student?.programme || '',
+        specialization: data?.lecturer?.specialization || '',
+        officeLocation: data?.lecturer?.officeLocation || '',
+        newPassword: ''
+    });
+
+    const [formData, setFormData] = useState(() => createFormState(initialData));
+    const [message, setMessage] = useState({ text: '', type: '' });
+    const [isLoading, setIsLoading] = useState(false);
+
+    // 2. Fix State Stagnation: Sync form data when initialData loads from the server
 
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(`Saving ${role} profile alterations:`, formData);
-    alert('Changes saved successfully!');
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setMessage({ text: '', type: '' });
 
-  // Helper method to slice out clean text initials
-  const getInitials = (name) => {
-    if (!name || !name.trim()) return 'U';
-    const cleanName = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.)\s+/i, '').trim();
-    if (!cleanName) return 'U';
-    const parts = cleanName.split(/\s+/);
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return parts[0][0].toUpperCase();
-  };
+        // 3. Tanzanian Phone Validation
+        if (backendRole === 'STUDENT' || backendRole === 'LECTURER') {
+            const cleanPhone = formData.phone.replace(/[\s\-()]/g, "");
+            const tzPhoneRegex = /^(?:\+?255|0)\d{8}$/;
 
-  return (
-    <div>
+            if (!tzPhoneRegex.test(cleanPhone)) {
+                setMessage({
+                    text: "Invalid Tanzanian phone format. Use 06, 07, or +255 followed by 8 digits.",
+                    type: "error"
+                });
+                return;
+            }
+        }
 
-       <div className='flex flex-col pl-33 pb-5'>
-         <h1 className='font-bold text-2xl'>My Profile</h1>
-       <p className='text-gray-400'>Manage your personal information</p>
-       </div>
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
+        setIsLoading(true);
 
-      {/* Blue Header Banner */}
-      <div className="bg-blue-900 h-32 relative px-8 flex items-end">
-        {/* Avatar Badge Layout */}
-        <div className="absolute -bottom-6 left-8 w-16 h-16 bg-blue-950 border-4 border-white text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm select-none">
-          {getInitials(formData.fullName)}
-        </div>
-      </div>
+        // 4. Construct structural payload for your backend route controller
+        const payload = {
+            fullName: formData.fullName,
+            email: formData.email,
+            role: backendRole,
+            ...(formData.newPassword && { password: formData.newPassword }),
+            profileInfo: {
+                department: formData.department,
+                phoneNumber: formData.phone,
+                ...(backendRole === 'STUDENT' && { programme: formData.programme }),
+                ...(backendRole === 'LECTURER' && {
+                    specialization: formData.specialization,
+                    officeLocation: formData.officeLocation
+                })
+            }
+        };
 
-      {/* User Quick Metadata Block */}
-      <div className="pt-8 px-8 pb-4">
-        <h2 className="text-xl font-bold text-slate-800 leading-tight">
-          {formData.fullName || 'User Profile'}
-        </h2>
-        <p className="text-sm text-slate-400 capitalize">
-          {role} · {formData.department || 'General'}
-          {role === 'student' && formData.yearOfStudy && ` · Year ${formData.yearOfStudy}`}
-        </p>
-      </div>
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile/update`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                 credentials: 'include',
+                body: JSON.stringify(payload)
+            });
 
-      {/* Profile Form */}
-      <form onSubmit={handleSubmit} className="p-8 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            const data = await response.json();
 
-          {/* Full Name */}
-          <div>
-            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Full Name</label>
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm"
-            />
-          </div>
+            if (!response.ok) {
+                throw new Error(data.error || data.message || "Failed to save data changes");
+            }
 
-          {/* Dynamic ID Label */}
-          <div>
-            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">
-              {role === 'student' ? 'Registration Number' : 'ID Number'}
-            </label>
-            <input
-              type="text"
-              name="idNumber"
-              value={formData.idNumber}
-              disabled
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-400 cursor-not-allowed shadow-inner"
-            />
-          </div>
+            setMessage({ text: 'Changes saved successfully!', type: 'success' });
+            setFormData(prev => ({ ...prev, newPassword: '' }));
 
-          {/* Email Address */}
-          <div>
-            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm"
-            />
-          </div>
+            if (data.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+            }
+        } catch (error) {
+            setMessage({ text: error.message, type: 'error' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-          {/* Phone Number */}
-          <div>
-            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Phone Number</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm"
-            />
-          </div>
+    const getInitials = (name) => {
+        if (!name || !name.trim()) return 'U';
+        const cleanName = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.)\s+/i, '').trim();
+        if (!cleanName) return 'U';
+        const parts = cleanName.split(/\s+/);
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return parts[0][0].toUpperCase();
+    };
 
-          {/* Department */}
-          <div>
-            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Department</label>
-            <input
-              type="text"
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm"
-            />
-          </div>
-
-          {/* ================= CONDITIONAL FIELDS DEPENDING ON ACTIVE ROLE ================= */}
-
-          {/* STUDENT VIEW: Shows Year of Study */}
-          {role === 'student' && (
-            <div>
-              <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Year of Study</label>
-              <select
-                name="yearOfStudy"
-                value={formData.yearOfStudy}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm appearance-none"
-              >
-                <option value="">Select Year</option>
-                <option value="1">Year 1</option>
-                <option value="2">Year 2</option>
-                <option value="3">Year 3</option>
-                <option value="4">Year 4</option>
-              </select>
-            </div>
-          )}
-
-          {/* LECTURER VIEW: Shows Office Location */}
-          {role === 'lecturer' && (
-            <div>
-              <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Office Location</label>
-              <input
-                type="text"
-                name="officeLocation"
-                placeholder="e.g., Block A, Room 204"
-                value={formData.officeLocation}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* New Password field remains globally accessible */}
+    return (
         <div>
-          <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">New Password</label>
-          <input
-            type="password"
-            name="newPassword"
-            placeholder="Leave blank to keep current password"
-            value={formData.newPassword}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm placeholder-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm"
-          />
-        </div>
+            <div className='flex flex-col pl-33 pb-5'>
+                <h1 className='font-bold text-2xl'>My Profile</h1>
+                <p className='text-gray-400'>Manage your personal information</p>
+            </div>
 
-        {/* Save Button */}
-        <div className="flex justify-end pt-2">
-          <button
-            type="submit"
-            className="bg-blue-950 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-900 transition-colors shadow-md"
-          >
-            Save Changes
-          </button>
+            <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
+                <div className="bg-blue-900 h-32 relative px-8 flex items-end">
+                    <div className="absolute -bottom-6 left-8 w-16 h-16 bg-blue-950 border-4 border-white text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm select-none">
+                        {getInitials(formData.fullName)}
+                    </div>
+                </div>
+
+                <div className="pt-8 px-8 pb-4">
+                    <h2 className="text-xl font-bold text-slate-800 leading-tight">
+                        {formData.fullName || 'User Profile'}
+                    </h2>
+                    <p className="text-sm text-slate-400 capitalize">
+                        {role} · {formData.department || 'General'}
+                    </p>
+                </div>
+
+                {message.text && (
+                    <div className={`mx-8 p-4 rounded-xl text-sm border ${
+                        message.type === 'success'
+                            ? 'bg-green-50 border-green-200 text-green-700'
+                            : 'bg-red-50 border-red-200 text-red-700'
+                    }`}>
+                        {message.text}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Full Name</label>
+                            <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Email Address</label>
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} required className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Phone Number</label>
+                            <input type="text" name="phone" value={formData.phone} onChange={handleChange} required placeholder="e.g., 0712345678" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Department</label>
+                            <input type="text" name="department" value={formData.department} onChange={handleChange} required className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                        </div>
+
+                        {/* STUDENT EXCLUSIVE VIEWS */}
+                        {backendRole === 'STUDENT' && (
+                            <div>
+                                <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Programme / Course</label>
+                                <input type="text" name="programme" value={formData.programme} onChange={handleChange} required placeholder="e.g., BSc IT" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                            </div>
+                        )}
+
+                        {/* LECTURER EXCLUSIVE VIEWS */}
+                        {backendRole === 'LECTURER' && (
+                            <>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Specialization</label>
+                                    <input type="text" name="specialization" value={formData.specialization} onChange={handleChange} required placeholder="e.g., Artificial Intelligence" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Office Location</label>
+                                    <input type="text" name="officeLocation" value={formData.officeLocation} onChange={handleChange} required placeholder="e.g., Block A, Room 204" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">New Password</label>
+                        <input type="password" name="newPassword" value={formData.newPassword} onChange={handleChange} placeholder="Leave blank to keep current password" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
+                    </div>
+
+                    <div className="flex justify-end">
+                        <button type="submit" disabled={isLoading} className="inline-flex items-center justify-center rounded-2xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                            {isLoading ? 'Saving...' : 'Save Changes'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </form>
-    </div>
-    </div>
-  );
-};
+    )}
 
 export default ProfileCard;

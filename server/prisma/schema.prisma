@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  LECTURER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  fullName  String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations (Defined on the target models)
+  student  StudentProfile?
+  lecturer LecturerProfile?
+  admin    AdminProfile?
+}
+
+model StudentProfile {
+  id          Int    @id @default(autoincrement())
+  department  String
+  programme   String
+  phoneNumber String @unique
+
+  // Relation fields
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int    @unique
+}
+
+model LecturerProfile {
+  id             Int    @id @default(autoincrement())
+  department     String
+  specialization String
+  officeLocation String
+  phoneNumber    String @unique
+
+  // Relation fields
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int    @unique
+}
+
+model AdminProfile {
+  id     Int  @id @default(autoincrement())
+
+  // Relation fields
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
+}

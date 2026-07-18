@@ -1,22 +1,52 @@
-//import React from 'react'
-
-import ProfileCard from "../../components/ProfileCard"
+import { useEffect, useState } from "react";
+import ProfileCard from "../../components/ProfileCard";
 
 const Profile = () => {
-   const studentData = {
-    fullName: 'Amina Diallo',
-    idNumber: 'REG/2023/8492',
-    email: 'a.diallo@university.edu',
-    phone: '+255 612 345 678',
-    department: 'Computer Science',
-    yearOfStudy: '3'
-  };
+    const [userData, setUserData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-  return (
-    <div>
-       <ProfileCard initialData={studentData}/>
-    </div>
-  )
-}
+    useEffect(() => {
+        // 1. Fetch the logged-in session data from local cache storage
+        const cachedUser = localStorage.getItem("user");
 
-export default Profile
+        if (cachedUser) {
+            // Parse the user record safely from its JSON string format
+            setUserData(JSON.parse(cachedUser));
+        }
+
+        setIsLoading(false);
+    }, []);
+
+    // 2. Guard Check: Display a temporary loading container while reading local state cache
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen text-slate-500 font-medium">
+                Loading profile data...
+            </div>
+        );
+    }
+
+    // 3. Fallback View: If no user is logged in, show an unauthorized alert block
+    if (!userData) {
+        return (
+            <div className="flex items-center justify-center min-h-screen text-rose-600 font-semibold">
+                Error: No active user session found. Please log in again.
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            {/*
+               Pass the real, database-mapped values dynamically to your ProfileCard.
+               The user role is transformed dynamically (e.g. 'LECTURER' becomes 'lecturer')
+            */}
+            <ProfileCard
+                role={userData.role?.toLowerCase() || 'student'}
+                initialData={userData}
+            />
+        </div>
+    );
+};
+
+export default Profile;

@@ -3,7 +3,7 @@ import { useState } from 'react';
 const ProfileCard = ({ role = 'student', initialData }) => {
     const backendRole = role.toUpperCase();
 
-    
+
 
     // 1. Initial State Definition Helper Function
     const createFormState = (data) => ({
@@ -36,11 +36,16 @@ const ProfileCard = ({ role = 'student', initialData }) => {
         // 3. Tanzanian Phone Validation
         if (backendRole === 'STUDENT' || backendRole === 'LECTURER') {
             const cleanPhone = formData.phone.replace(/[\s\-()]/g, "");
-            const tzPhoneRegex = /^(?:\+?255|0)\d{8}$/;
 
-            if (!tzPhoneRegex.test(cleanPhone)) {
+              // 2. Validate format and exact length constraints
+    const isLocalValid = cleanPhone.startsWith('0') && cleanPhone.length === 10;
+    const isInternationalValid = cleanPhone.startsWith('+255') && cleanPhone.length === 13;
+    const isNoPlusValid = cleanPhone.startsWith('255') && cleanPhone.length === 12;
+
+
+            if (!isLocalValid && !isInternationalValid && !isNoPlusValid) {
                 setMessage({
-                    text: "Invalid Tanzanian phone format. Use 06, 07, or +255 followed by 8 digits.",
+                    text: "Invalid Tanzanian phone number length. Use a domestic layout (e.g., 0740544147) or international layout (e.g., +255740544147).",
                     type: "error"
                 });
                 return;
@@ -67,7 +72,7 @@ const ProfileCard = ({ role = 'student', initialData }) => {
         };
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile/update`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/update`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                  credentials: 'include',

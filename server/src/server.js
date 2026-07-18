@@ -9,12 +9,16 @@ config();
 
 const app = express();
 // middlewares
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "https://uacbs-connect-s26l-eawel6ogz-silemmoses-8698s-projects.vercel.app,https://uacbs-connect-s26l.vercel.app,http://localhost:5173").split(",").map(s => s.trim());
+
 app.use(cors({
-  origin: [
-    "https://uacbs-connect-s26l-eawel6ogz-silemmoses-8698s-projects.vercel.app",
-    "https://uacbs-connect-s26l.vercel.app",
-    "http://localhost:5173"
-  ],
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser requests (curl, postman)
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: origin not allowed'));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]

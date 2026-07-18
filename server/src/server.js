@@ -9,23 +9,24 @@ config();
 
 const app = express();
 
+const corsOptions = {
+  origin: [
+    "https://uacbs-connect-s26l-i99jhrewm-silemmoses-8698s-projects.vercel.app",
+    "https://uacbs-connect-s26l-eawel6ogz-silemmoses-8698s-projects.vercel.app",
+    "http://localhost:5173"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // 2. Activate cookie parsing before processing routes
-
-
-
-
-app.use(cors({
-  origin: [
-    "https://uacbs-connect-s26l-eawel6ogz-silemmoses-8698s-projects.vercel.app"
-
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Added OPTIONS to handle browser preflight checks
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(cookieParser());
 
 // api end points
 app.use("/auth", authRoute);

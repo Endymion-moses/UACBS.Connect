@@ -8,26 +8,25 @@ import userRoute from "./routes/userRoute.js";
 config();
 
 const app = express();
-
 // middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // 2. Activate cookie parsing before processing routes
-
-// api end points
-
-app.use("/auth", authRoute);
-app.use("/user", userRoute);
-
 app.use(cors({
   origin: [
-    "https://uacbs-connect-s26l-eawel6ogz-silemmoses-8698s-projects.vercel.app", // Your live Vercel frontend
-    "http://localhost:5173"                                                    // Local development testing
+    "https://uacbs-connect-s26l-eawel6ogz-silemmoses-8698s-projects.vercel.app",
+    "https://uacbs-connect-s26l.vercel.app",
+    "http://localhost:5173"
   ],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Added OPTIONS to handle browser preflight checks
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// api end points
+app.use("/auth", authRoute);
+app.use("/user", userRoute);
 
 
 

@@ -14,6 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // 2. Activate cookie parsing before processing routes
 
+app.use("/auth", authRoute);
+app.use("/user", userRoute);
+
 app.use(cors({
   origin: [
     "https://uacbs-connect-s26l-5q0evx6dq-silemmoses-8698s-projects.vercel.app", // Your live Vercel frontend
@@ -25,8 +28,7 @@ app.use(cors({
 }));
 
 // api end points
-app.use("/auth", authRoute);
-app.use("/user", userRoute)
+
 
 // Fallback to environment configuration file ports if specified
 const PORT = process.env.PORT || 5000;

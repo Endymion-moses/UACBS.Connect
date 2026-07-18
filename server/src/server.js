@@ -14,6 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // 2. Activate cookie parsing before processing routes
 
+// api end points
+
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 
@@ -27,7 +29,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// api end points
+
 
 
 // Fallback to environment configuration file ports if specified

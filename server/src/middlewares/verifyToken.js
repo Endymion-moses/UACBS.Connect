@@ -3,7 +3,14 @@ import jwt from "jsonwebtoken";
 export const verifyToken = (req, res, next) => {
     try {
         // Read the cookie from the request (enabled by cookie-parser)
-        const token = req.cookies.token;
+                // Accept token from either the Authorization header (Bearer <token>)
+        // or a cookie named "token", so it works with both auth styles.
+        const authHeader = req.headers.authorization;
+        const headerToken = authHeader && authHeader.startsWith("Bearer ")
+            ? authHeader.split(" ")[1]
+            : null;
+
+        const token = headerToken || req.cookies.token;
 
         if (!token) {
             return res.status(401).json({ error: "Access denied. No session token found." });

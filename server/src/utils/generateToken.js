@@ -23,4 +23,6 @@ export const generateToken = (userId, role, res) => {
     });
 
     return token;
+
+    
 };

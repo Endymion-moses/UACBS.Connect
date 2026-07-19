@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
+
 
 const roles = ["Student", "Lecturer", "Admin"];
 
@@ -19,7 +19,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+
 
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -112,11 +112,8 @@ const Register = () => {
         throw new Error(data.error || data.message || "Registration failed");
       }
 
-      if (login) {
-        login(data.user);
-      }
+     navigate("/");
 
-      navigate(`/${role.toLowerCase()}`);
     } catch (err) {
       setError(err.message);
     } finally {

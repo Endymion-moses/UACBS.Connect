@@ -50,9 +50,12 @@ const Login = () => {
                 // 1. Clear out old leftover data from the local storage cache first
                 localStorage.removeItem("user");
                 localStorage.removeItem("profile");
+                localStorage.removeItem("token"); // add this too, for consistency
+
 
                 // 2. Save the fresh logged-in user profile details to local storage
                 localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("token", data.token);
                 if (data.profile) {
                     localStorage.setItem("profile", JSON.stringify(data.profile));
                 }

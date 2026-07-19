@@ -71,11 +71,17 @@ const ProfileCard = ({ role = 'student', initialData }) => {
             }
         };
 
-        try {
+                try {
+            // 1. Grab the token from wherever you store it upon successful login
+            const token = localStorage.getItem("token"); // or from your auth context/state
+
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/update`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                 credentials: 'include',
+                headers: {
+                'Content-Type': 'application/json',
+                // 2. Add the secure token header to pass the verifyToken middleware guard
+                'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 

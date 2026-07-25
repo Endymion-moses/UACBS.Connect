@@ -15,6 +15,7 @@ import StudentProfile from "../pages/student/Profile";
 
 // Lecturer pages
 import LecturerDashboard from "../pages/lecturer/Dashboard";
+import Availability from "../pages/lecturer/Availability";
 import LecturerRequests from "../pages/lecturer/Requests";
 import LecturerSchedule from "../pages/lecturer/Schedule";
 import LecturerNotifications from "../pages/lecturer/Notifications";
@@ -46,6 +47,7 @@ const AppRoutes = () => (
       <Route path="/lecturer" element={<LecturerLayout />}>
         <Route index element={<LecturerDashboard />} />
         <Route path="dashboard" element={<LecturerDashboard />} />
+        <Route path="availability" element={<Availability/>}/>
         <Route path="requests" element={<LecturerRequests />} />
         <Route path="schedule" element={<LecturerSchedule />} />
         <Route path="notifications" element={<LecturerNotifications />} />

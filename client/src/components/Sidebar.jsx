@@ -53,6 +53,7 @@ const getInitials = (name) => {
     lecturer: [
       { path: '/lecturer/dashboard', label: 'Dashboard' },
       { path: '/lecturer/requests', label: 'Requests' },
+      {path:'/lecturer/availability', label:'My Availability'},
       { path: '/lecturer/schedule', label: 'Schedule' },
       { path: '/lecturer/notifications', label: 'Notifications' },
       { path: '/lecturer/profile', label: 'My Profile' },
@@ -79,7 +80,7 @@ const getInitials = (name) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed md:sticky md:top-0 w-72 h-screen overflow-y-auto bg-blue-900 text-white px-6 py-8 z-40 transition-transform duration-300 md:translate-x-0 ${
+      <aside className={`fixed md:sticky md:top-0 w-70 h-screen overflow-y-auto bg-blue-900 text-white px-6 py-8 z-40 transition-transform duration-300 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } md:block`}>
         <div className="mb-8 flex items-center justify-between">
@@ -100,7 +101,7 @@ const getInitials = (name) => {
           </button>
         </div>
 
-        <hr className='w-full text-gray-400 p-5'/>
+        <hr className='w-full text-gray-400 p-3'/>
 
         <nav className='pb-10'>
           <ul className="space-y-3">
@@ -109,7 +110,7 @@ const getInitials = (name) => {
                 <Link
                   to={item.path}
                   onClick={onClose}
-                  className="block rounded-lg px-4 py-3 text-sm hover:bg-blue-800 text-lg text-gray-100"
+                  className="block rounded-lg px-4 py-1 text-sm hover:bg-blue-800 text-lg text-gray-100"
                 >
                   {item.label}
                 </Link>
@@ -119,11 +120,11 @@ const getInitials = (name) => {
         </nav>
 
 
-        <hr className='w-full text-gray-400'/>
+        <hr className='w-full text-gray-400 '/>
 
         <div className='pt-10 flex flex-col gap-4'>
     {/* User Profile Info block */}
-    <div className="flex items-center gap-3 px-2">
+    <div className="flex items-center gap-3 px-2 pt-20">
 
         {/* Dynamic Avatar Initials Circle */}
         <div className="w-10 h-10 rounded-full bg-white text-blue-900 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm select-none">

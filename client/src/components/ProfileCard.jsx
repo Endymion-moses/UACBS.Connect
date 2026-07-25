@@ -120,7 +120,7 @@ const ProfileCard = ({ role = 'student', initialData }) => {
                 <p className='text-gray-400'>Manage your personal information</p>
             </div>
 
-            <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
+            <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
                 <div className="bg-blue-900 h-32 relative px-8 flex items-end">
                     <div className="absolute -bottom-6 left-8 w-16 h-16 bg-blue-950 border-4 border-white text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm select-none">
                         {getInitials(formData.fullName)}

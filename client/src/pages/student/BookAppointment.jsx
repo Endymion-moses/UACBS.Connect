@@ -9,7 +9,7 @@ import {AVAILABLE_TIMES} from '../../services/appointmentServices'
 
 export default function ConsultationBooking() {
   // --- Form State ---
-  const [selectedLecturer, setSelectedLecturer] = useState(null);
+  const [selectedLecturer, setSelectedLecturer] = useState([]);
   const [selectedDate, setSelectedDate] = useState(''); // Example hardcoded date selection
   const [selectedTime, setSelectedTime] = useState('');
   const [reason, setReason] = useState('');
@@ -33,13 +33,16 @@ export default function ConsultationBooking() {
     alert('Booking Request Submitted Successfully!');
   };
 
+  //API fetching from the database
+ 
+
   return (
     <div className="max-w-6xl mx-auto p-6 bg-slate-50 min-h-screen font-sans text-slate-700">
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-        
+
         {/* ================= LEFT COLUMN ================= */}
         <div className="space-y-6">
-          
+
           {/* 1. SELECT LECTURER */}
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">1 — SELECT LECTURER</h2>
@@ -81,9 +84,9 @@ export default function ConsultationBooking() {
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">2 — SELECT DATE</h2>
             <div className="border border-slate-200 rounded-xl p-4 text-center">
               <p className="text-sm font-medium mb-2">June 2026</p>
-              <input 
-                type="date" 
-                value={selectedDate} 
+              <input
+                type="date"
+                value={selectedDate}
                 onChange={(e) => {
                   setSelectedDate(e.target.value);
                   setSelectedTime('');
@@ -97,11 +100,11 @@ export default function ConsultationBooking() {
 
         {/* ================= RIGHT COLUMN ================= */}
         <div className="space-y-6">
-          
+
           {/* 3. SELECT TIME */}
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm min-h-[140px] flex flex-col justify-center">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4 self-start">3 — SELECT TIME</h2>
-            
+
             {!selectedDate || !selectedLecturer ? (
               <p className="text-slate-400 text-sm text-center py-4">Pick a lecturer and date first</p>
             ) : (
@@ -112,8 +115,8 @@ export default function ConsultationBooking() {
                     type="button"
                     onClick={() => setSelectedTime(time)}
                     className={`py-2 px-3 text-xs font-medium rounded-lg border transition-all ${
-                      selectedTime === time 
-                        ? 'bg-blue-900 text-white border-grey-100' 
+                      selectedTime === time
+                        ? 'bg-blue-900 text-white border-grey-100'
                         : 'border-slate-200 hover:border-green-500 hover:bg-green-100'
                     }`}
                   >
@@ -146,8 +149,8 @@ export default function ConsultationBooking() {
             type="submit"
             disabled={!isFormValid}
             className={`w-full py-4 rounded-xl font-medium text-sm transition-all shadow-sm ${
-              isFormValid 
-                ? 'bg-slate-800 text-white hover:bg-slate-900 cursor-pointer' 
+              isFormValid
+                ? 'bg-slate-800 text-white hover:bg-slate-900 cursor-pointer'
                 : 'bg-slate-300 text-slate-100 cursor-not-allowed'
             }`}
           >

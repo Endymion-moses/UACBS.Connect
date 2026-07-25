@@ -4,6 +4,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser"; // 1. Import cookie parser
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
+import lecturerRoute from "./routes/lecturerRoutes.js";
+import availabilityRoute from "./routes/availabilityRoutes.js";
+import { connectDB, disconnectDB } from "./config/database.js";
 
 config();
 
@@ -30,12 +33,29 @@ app.use(cors({
 // api end points
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
+app.use("/lecturer", lecturerRoute);
+app.use("/lecturer", availabilityRoute);
 
 
 
 // Fallback to environment configuration file ports if specified
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
+const startServer = async () => {
+  await connectDB();
+  const server = app.listen(PORT, () => {
     console.log(`Server running at PORT ${PORT}`);
+  });
+
+  const shutdown = async () => {
+    await disconnectDB();
+    server.close(() => process.exit(0));
+  };
+  process.once("SIGINT", shutdown);
+  process.once("SIGTERM", shutdown);
+};
+
+startServer().catch((error) => {
+  console.error("Unable to start server", error);
+  process.exit(1);
 });

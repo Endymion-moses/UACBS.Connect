@@ -146,10 +146,20 @@ const Login = () => {
 
                     <form onSubmit={handleSubmit}>
                         <label className="block text-gray-700 text-lg font-bold mb-2">Email Address</label>
-                        <input type="email" required placeholder="student@university.edu" value={email} onChange={(e) => setEmail(e.target.value)} className="shadow appearance-none border border-white rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-white" />
+                        <input type="email"
+                         required
+                         placeholder="student@university.edu"
+                         value={email}
+                         onChange={(e) => setEmail(e.target.value)}
+                         className="shadow appearance-none border border-white rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-white" />
 
                         <label className="block text-gray-700 text-lg font-bold mb-2 mt-4">Password</label>
-                        <input type="password" required placeholder="............" value={password} onChange={(e) => setPassword(e.target.value)} className="shadow appearance-none border border-white rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-white" />
+                        <input
+                        type="password"
+                        required
+                        placeholder="............"
+                        value={password} onChange={(e) => setPassword(e.target.value)}
+                        className="shadow appearance-none border border-white rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-white" />
 
                         <div className= "flex justify-between items-center my-4">
                             <div className="flex items-center gap-2">

@@ -1,9 +1,10 @@
 
 
-import { useState } from 'react';
-import {LECTURERS} from '../../services/appointmentServices'
+import { useEffect, useState } from 'react';
 import {AVAILABLE_TIMES} from '../../services/appointmentServices'
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const initialsFromName = (name) => name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
 
 
@@ -13,6 +14,34 @@ export default function ConsultationBooking() {
   const [selectedDate, setSelectedDate] = useState(''); // Example hardcoded date selection
   const [selectedTime, setSelectedTime] = useState('');
   const [reason, setReason] = useState('');
+  const [lecturers, setLecturers] = useState([]);
+  const [lecturersError, setLecturersError] = useState('');
+
+  useEffect(() => {
+    const loadLecturers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${apiBaseUrl}/lecturer/lecturers`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: "include",
+        });
+        const contentType = response.headers.get("content-type") || "";
+        const data = contentType.includes("application/json") ? await response.json() : null;
+        if (!response.ok) throw new Error(data?.message || "Could not load lecturers.");
+
+        setLecturers(data.map((lecturer) => ({
+          id: lecturer.id,
+          name: lecturer.user.fullName,
+          department: lecturer.department,
+          initials: initialsFromName(lecturer.user.fullName),
+          isOnline: lecturer.isOnline,
+        })));
+      } catch (error) {
+        setLecturersError(error.message || "Could not load lecturers.");
+      }
+    };
+    loadLecturers();
+  }, []);
 
   // --- Form Validation ---
   const isFormValid = selectedLecturer && selectedDate && selectedTime && reason.trim().length > 0;
@@ -47,19 +76,21 @@ export default function ConsultationBooking() {
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">1 — SELECT LECTURER</h2>
             <div className="space-y-3">
-              {LECTURERS.map((lecturer) => {
+              {lecturersError && <p className="text-sm text-rose-600">{lecturersError}</p>}
+              {!lecturersError && lecturers.length === 0 && <p className="text-sm text-slate-400">Loading lecturers...</p>}
+              {lecturers.map((lecturer) => {
                 const isSelected = selectedLecturer?.id === lecturer.id;
                 return (
                   <button
                     key={lecturer.id}
                     type="button"
-                    disabled={!lecturer.available}
+                    disabled={!lecturer.isOnline}
                     onClick={() => {
                       setSelectedLecturer(lecturer);
                       setSelectedTime(''); // Reset time when lecturer changes
                     }}
                     className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
-                      !lecturer.available ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-100' :
+                      !lecturer.isOnline ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-100' :
                       isSelected ? 'border-slate-800 bg-white ring-1 ring-slate-800' : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
@@ -72,7 +103,10 @@ export default function ConsultationBooking() {
                         <p className="text-xs text-slate-400">{lecturer.department}</p>
                       </div>
                     </div>
-                    <span className={`w-2 h-2 rounded-full ${lecturer.available ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                    <span
+                      title={lecturer.isOnline ? "Online" : "Offline"}
+                      className={`w-2 h-2 rounded-full ${lecturer.isOnline ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                    />
                   </button>
                 );
               })}

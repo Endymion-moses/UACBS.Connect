@@ -1,14 +1,59 @@
-//import React from 'react'
+import { useEffect, useState } from "react";
 import { assets } from "../../assets/assets"
 import { Link } from "react-router-dom"
 import { countByStatus, countUpcoming } from '../../services/appointmentServices';
-import {LECTURERS} from '../../services/appointmentServices'
 import DashboardStats from "../../components/DashboardStats";
 import useAppointment from "../../hooks/useAppointment";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
+const initialsFromName = (name) => name
+  .split(" ")
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((part) => part[0])
+  .join("")
+  .toUpperCase();
+
 const StudentDashboard = () => {
   const { appointments } = useAppointment();
+  const [lecturers, setLecturers] = useState([]);
+  const [lecturersError, setLecturersError] = useState("");
   const recentAppointments = appointments.slice(0, 4);
+
+  useEffect(() => {
+    const loadLecturers = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLecturersError("Please sign in again to view lecturers.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/lecturer/lecturers`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+        });
+        const contentType = response.headers.get("content-type") || "";
+        const data = contentType.includes("application/json") ? await response.json() : null;
+        if (!response.ok) {
+          throw new Error(data?.message || "Could not load lecturers.");
+        }
+
+        setLecturers(data.map((lecturer) => ({
+          id: lecturer.id,
+          name: lecturer.user.fullName,
+          initials: initialsFromName(lecturer.user.fullName),
+          department: lecturer.department,
+          isOnline: lecturer.isOnline,
+        })));
+      } catch (error) {
+        setLecturersError(error.message || "Could not load lecturers.");
+      }
+    };
+
+    loadLecturers();
+  }, []);
   const studentStats = [
     {
       image: assets.upcoming_icon,
@@ -92,13 +137,14 @@ const StudentDashboard = () => {
                     <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm w-full lg:w-80 pb-15">
                       <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">1 — SELECT LECTURER</h2>
                       <div className=" flex flex-col gap-5 ">
-                        {LECTURERS.map((lecturer) => {
+                        {lecturersError && <p className="text-sm text-rose-600">{lecturersError}</p>}
+                        {!lecturersError && lecturers.length === 0 && <p className="text-sm text-slate-400">Loading lecturers...</p>}
+                        {lecturers.map((lecturer) => {
 
                           return (
                             <button
                               key={lecturer.id}
                               type="button"
-                              disabled={!lecturer.available}
                              className="flex justify-between border border-gray-100 bg-gray-100 p-2 rounded-xl"
                             >
                               <div className="flex items-center gap-4">
@@ -112,7 +158,10 @@ const StudentDashboard = () => {
                               </div>
 
                                <div className="flex items-center justify-center">
-                                   <span className={`w-2 h-2 rounded-full  ${lecturer.available ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                   <span
+                                     title={lecturer.isOnline ? "Online" : "Offline"}
+                                     className={`w-2 h-2 rounded-full ${lecturer.isOnline ? "bg-emerald-500" : "bg-slate-300"}`}
+                                   />
                                </div>
                             </button>
                           );

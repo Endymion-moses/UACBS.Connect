@@ -7,6 +7,8 @@ import userRoute from "./routes/userRoute.js";
 import lecturerRoute from "./routes/lecturerRoutes.js";
 import availabilityRoute from "./routes/availabilityRoutes.js";
 import { connectDB, disconnectDB } from "./config/database.js";
+import appointmentRoute from "./routes/appointmentRoutes.js";
+import notificationRoute from "./routes/notificationRoutes.js";
 
 config();
 
@@ -35,6 +37,8 @@ app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/lecturer", lecturerRoute);
 app.use("/lecturer", availabilityRoute);
+app.use("/appointments", appointmentRoute);
+app.use("/notifications", notificationRoute);
 
 
 

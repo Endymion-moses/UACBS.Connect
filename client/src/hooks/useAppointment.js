@@ -1,41 +1,65 @@
-import { useEffect, useState } from "react";
-import { APPOINTMENTS } from "../services/appointmentServices";
+import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "uacbs-appointments";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const titleCase = (status) => status[0] + status.slice(1).toLowerCase();
+const initials = (name) => name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
-const getSavedAppointments = () => {
-  const savedAppointments = localStorage.getItem(STORAGE_KEY);
+const mapAppointment = (appointment) => ({
+  id: appointment.id,
+  name: appointment.lecturer.user.fullName,
+  initials: initials(appointment.lecturer.user.fullName),
+  task: appointment.reason,
+  date: appointment.appointmentDate,
+  time: appointment.timeSlot,
+  status: titleCase(appointment.status),
+});
 
-  if (!savedAppointments) {
-    return APPOINTMENTS;
+const readApiResponse = async (response) => {
+  const contentType = response.headers.get("content-type") || "";
+  const data = contentType.includes("application/json") ? await response.json() : null;
+  if (!response.ok) {
+    if (response.status === 404) throw new Error("The appointments API route is not deployed on the server yet.");
+    throw new Error(data?.message || `Request failed (${response.status})`);
   }
-
-  try {
-    return JSON.parse(savedAppointments);
-  } catch {
-    return APPOINTMENTS;
-  }
+  if (!data) throw new Error("The server returned an unexpected response.");
+  return data;
 };
 
 export const useAppointment = () => {
-  const [appointments, setAppointments] = useState(getSavedAppointments);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-  }, [appointments]);
+  const loadAppointments = useCallback(async () => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/appointments/mine`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        credentials: "include",
+      });
+      const data = await readApiResponse(response);
+      setAppointments(data.map(mapAppointment));
+      setError("");
+    } catch (requestError) {
+      setError(requestError.message || "Could not load appointments.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const updateAppointmentStatus = (id, status) => {
-    setAppointments((prevAppointments) =>
-      prevAppointments.map((appointment) =>
-        appointment.id === id ? { ...appointment, status } : appointment
-      )
-    );
+  useEffect(() => { loadAppointments(); }, [loadAppointments]);
+
+  const updateAppointmentStatus = async (id, status) => {
+    if (status !== "Cancelled") return;
+    const response = await fetch(`${apiBaseUrl}/appointments/${id}/cancel`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      credentials: "include",
+    });
+    const data = await readApiResponse(response);
+    setAppointments((current) => current.map((appointment) => appointment.id === id ? mapAppointment(data) : appointment));
   };
 
-  return {
-    appointments,
-    updateAppointmentStatus,
-  };
+  return { appointments, loading, error, updateAppointmentStatus };
 };
 
 export default useAppointment;

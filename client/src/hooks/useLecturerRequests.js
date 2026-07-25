@@ -1,46 +1,64 @@
-import { useEffect, useState } from "react";
-import { LECTURER_REQUESTS } from "../services/appointmentServices";
+import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "uacbs-lecturer-requests";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
-const getSavedRequests = () => {
-  const savedRequests = localStorage.getItem(STORAGE_KEY);
+const mapRequest = (appointment) => ({
+  id: appointment.id,
+  student: appointment.student.user.fullName,
+  studentId: appointment.student.user.email,
+  initials: appointment.student.user.fullName.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase(),
+  topic: appointment.reason,
+  date: appointment.appointmentDate,
+  time: appointment.timeSlot,
+  status: appointment.status[0] + appointment.status.slice(1).toLowerCase(),
+});
 
-  if (!savedRequests) {
-    return LECTURER_REQUESTS;
+const readApiResponse = async (response) => {
+  const contentType = response.headers.get("content-type") || "";
+  const data = contentType.includes("application/json") ? await response.json() : null;
+  if (!response.ok) {
+    if (response.status === 404) throw new Error("The appointment requests API route is not deployed on the server yet.");
+    throw new Error(data?.message || `Request failed (${response.status})`);
   }
-
-  try {
-    const parsedRequests = JSON.parse(savedRequests);
-    const hasRequiredFields = parsedRequests.every((request) =>
-      request.studentId && request.initials && request.topic
-    );
-
-    return hasRequiredFields ? parsedRequests : LECTURER_REQUESTS;
-  } catch {
-    return LECTURER_REQUESTS;
-  }
+  if (!data) throw new Error("The server returned an unexpected response.");
+  return data;
 };
 
 export const useLecturerRequests = () => {
-  const [requests, setRequests] = useState(getSavedRequests);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
-  }, [requests]);
+  const loadRequests = useCallback(async () => {
+    try {
+      setError("");
+      const response = await fetch(`${apiBaseUrl}/appointments/lecturer/requests`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        credentials: "include",
+      });
+      const data = await readApiResponse(response);
+      setRequests(data.map(mapRequest));
+    } catch (requestError) {
+      setError(requestError.message || "Could not load appointment requests.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const updateRequestStatus = (id, status) => {
-    setRequests((prevRequests) =>
-      prevRequests.map((request) =>
-        request.id === id ? { ...request, status } : request
-      )
-    );
+  useEffect(() => { loadRequests(); }, [loadRequests]);
+
+  const updateRequestStatus = async (id, status) => {
+    const response = await fetch(`${apiBaseUrl}/appointments/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+      credentials: "include",
+      body: JSON.stringify({ status }),
+    });
+    const data = await readApiResponse(response);
+    setRequests((current) => current.map((request) => request.id === id ? mapRequest(data) : request));
   };
 
-  return {
-    requests,
-    updateRequestStatus,
-  };
+  return { requests, loading, error, updateRequestStatus };
 };
 
 export default useLecturerRequests;

@@ -1,7 +1,7 @@
 
 
 import { useEffect, useState } from 'react';
-import {AVAILABLE_TIMES} from '../../services/appointmentServices'
+import { useNavigate } from "react-router-dom";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const initialsFromName = (name) => name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
@@ -16,6 +16,17 @@ export default function ConsultationBooking() {
   const [reason, setReason] = useState('');
   const [lecturers, setLecturers] = useState([]);
   const [lecturersError, setLecturersError] = useState('');
+  const [availability, setAvailability] = useState([]);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const selectedDay = selectedDate
+    ? new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "UTC" }).format(new Date(`${selectedDate}T12:00:00Z`))
+    : null;
+  const availableTimes = availability
+    .filter((slot) => slot.dayOfWeek === selectedDay && slot.isAvailable)
+    .map((slot) => slot.timeSlot);
 
   useEffect(() => {
     const loadLecturers = async () => {
@@ -46,20 +57,43 @@ export default function ConsultationBooking() {
   // --- Form Validation ---
   const isFormValid = selectedLecturer && selectedDate && selectedTime && reason.trim().length > 0;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) return;
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+      const response = await fetch(`${apiBaseUrl}/appointments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        credentials: "include",
+        body: JSON.stringify({ lecturerId: selectedLecturer.id, appointmentDate: selectedDate, timeSlot: selectedTime, reason }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Could not submit appointment request.");
+      navigate("/student/appointments");
+    } catch (error) {
+      setSubmitError(error.message || "Could not submit appointment request.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    const submissionData = {
-      lecturerId: selectedLecturer.id,
-      lecturerName: selectedLecturer.name,
-      date: selectedDate,
-      time: selectedTime,
-      reason: reason,
-    };
-
-    console.log('Submitted Data:', submissionData);
-    alert('Booking Request Submitted Successfully!');
+  const selectLecturer = async (lecturer) => {
+    setSelectedLecturer(lecturer);
+    setSelectedTime('');
+    setAvailability([]);
+    try {
+      const response = await fetch(`${apiBaseUrl}/lecturer/${lecturer.id}/availability`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Could not load lecturer availability.");
+      setAvailability(data);
+    } catch (error) {
+      setSubmitError(error.message || "Could not load lecturer availability.");
+    }
   };
 
   //API fetching from the database
@@ -84,13 +118,10 @@ export default function ConsultationBooking() {
                   <button
                     key={lecturer.id}
                     type="button"
-                    disabled={!lecturer.isOnline}
                     onClick={() => {
-                      setSelectedLecturer(lecturer);
-                      setSelectedTime(''); // Reset time when lecturer changes
+                      selectLecturer(lecturer);
                     }}
                     className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
-                      !lecturer.isOnline ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-100' :
                       isSelected ? 'border-slate-800 bg-white ring-1 ring-slate-800' : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
@@ -143,7 +174,9 @@ export default function ConsultationBooking() {
               <p className="text-slate-400 text-sm text-center py-4">Pick a lecturer and date first</p>
             ) : (
               <div className="grid grid-cols-2 gap-2">
-                {AVAILABLE_TIMES.map((time) => (
+                {availableTimes.length === 0 ? (
+                  <p className="col-span-2 text-center text-sm text-slate-400">No available time slots for this date.</p>
+                ) : availableTimes.map((time) => (
                   <button
                     key={time}
                     type="button"
@@ -160,6 +193,8 @@ export default function ConsultationBooking() {
               </div>
             )}
           </div>
+
+          {submitError && <p className="rounded-xl bg-rose-50 p-3 text-sm text-rose-600">{submitError}</p>}
 
           {/* 4. REASON */}
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
@@ -181,14 +216,14 @@ export default function ConsultationBooking() {
           {/* SUBMIT BUTTON */}
           <button
             type="submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
             className={`w-full py-4 rounded-xl font-medium text-sm transition-all shadow-sm ${
               isFormValid
                 ? 'bg-slate-800 text-white hover:bg-slate-900 cursor-pointer'
                 : 'bg-slate-300 text-slate-100 cursor-not-allowed'
             }`}
           >
-            Submit Request
+            {isSubmitting ? "Submitting..." : "Submit Request"}
           </button>
 
         </div>

@@ -18,7 +18,7 @@ const formatDate = (date) => {
 
 const Requests = () => {
   const [activeTab, setActiveTab] = useState("All");
-  const { requests, updateRequestStatus } = useLecturerRequests();
+  const { requests, loading, error, updateRequestStatus } = useLecturerRequests();
 
   const pendingCount = countByStatus(requests, "Pending");
   const filteredRequests =
@@ -64,6 +64,8 @@ const Requests = () => {
       </div>
 
       <div className="flex flex-col gap-4">
+        {error && <p className="rounded-xl bg-rose-50 p-3 text-sm text-rose-600">{error}</p>}
+        {loading && <p className="text-center text-sm text-slate-400">Loading requests...</p>}
         {filteredRequests.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-400">
             No {activeTab.toLowerCase()} requests found.

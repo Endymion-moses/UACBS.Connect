@@ -12,7 +12,7 @@ const statusStyles = {
 
 export default function AppointmentDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { appointments, updateAppointmentStatus } = useAppointment();
+  const { appointments, loading, error, updateAppointmentStatus } = useAppointment();
   const activeTab = searchParams.get("tab") || "All";
 
   const filteredAppointments =
@@ -63,6 +63,8 @@ export default function AppointmentDashboard() {
       </div>
 
       <div className="flex flex-col gap-4">
+        {error && <p className="rounded-xl bg-rose-50 p-3 text-sm text-rose-600">{error}</p>}
+        {loading && <p className="text-center text-sm text-slate-400">Loading appointments...</p>}
         {filteredAppointments.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-400">
             No {activeTab.toLowerCase()} appointments found.

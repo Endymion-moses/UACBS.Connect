@@ -1,17 +1,16 @@
 //import React from 'react'
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {assets} from '../assets/assets'
+import { useNotifications } from "../hooks/useNotifications";
 
 const Navbar = () => {
-   const [user, setUser] = useState(null);
-
-   useEffect(() => {
-    // Read the active session data we saved during the login phase
-    const cachedUser = localStorage.getItem("user");
-    if (cachedUser) {
-        setUser(JSON.parse(cachedUser));
-    }
-}, []);
+   const [user] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("user") || "null"); } catch { return null; }
+   });
+   const { unreadCount } = useNotifications();
+   const location = useLocation();
+   const notificationsPath = location.pathname.startsWith("/lecturer") ? "/lecturer/notifications" : "/student/notifications";
 
 // Helper function to extract initials safely from the user's name
 const getInitials = (name) => {
@@ -23,11 +22,11 @@ const getInitials = (name) => {
   return (
 
     <div className='flex ml-auto gap-5 items-center'>
-        <div className='relative cursor-pointer'>
+        <Link to={notificationsPath} className='relative cursor-pointer' aria-label={`${unreadCount} unread notifications`}>
           <img src={assets.notification_icon} alt="notifications" className='h-6 w-6'/>
-          <span className='absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold
-          rounded-full h-5 w-5 flex items-center justify-center'>2</span>
-        </div>
+          {unreadCount > 0 && <span className='absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold
+          rounded-full h-5 min-w-5 px-1 flex items-center justify-center'>{unreadCount > 99 ? "99+" : unreadCount}</span>}
+        </Link>
         <button className='border border-blue-900 rounded-full
          w-8 h-8 bg-blue-900 text-white font-semibold hover:bg-blue-800'> {getInitials(user?.fullName)}</button>
     </div>

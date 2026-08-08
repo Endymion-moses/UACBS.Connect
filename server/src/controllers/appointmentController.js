@@ -37,6 +37,7 @@ export const createAppointment = async (req, res) => {
           type: "reminder",
           title: "New appointment request",
           message: `${created.student.user.fullName} requested ${appointmentDate} at ${timeSlot}.`,
+          appointmentId: created.id,
         },
       });
       return created;
@@ -93,7 +94,12 @@ export const updateAppointmentStatus = async (req, res) => {
           type: status === "APPROVED" ? "approved" : "rejected",
           title: `Appointment ${status === "APPROVED" ? "approved" : "rejected"}`,
           message: `${changed.lecturer.user.fullName} ${status === "APPROVED" ? "approved" : "rejected"} your appointment for ${changed.appointmentDate} at ${changed.timeSlot}.`,
+          appointmentId: changed.id,
         },
+      });
+      await tx.notification.updateMany({
+        where: { userId: lecturer.userId, appointmentId: changed.id, type: "reminder" },
+        data: { isRead: true, type: "info", title: "Appointment request handled" },
       });
       return changed;
     });

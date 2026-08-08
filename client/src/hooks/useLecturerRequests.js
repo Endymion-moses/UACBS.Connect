@@ -28,6 +28,7 @@ export const useLecturerRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
 
   const loadRequests = useCallback(async () => {
     try {
@@ -48,17 +49,28 @@ export const useLecturerRequests = () => {
   useEffect(() => { loadRequests(); }, [loadRequests]);
 
   const updateRequestStatus = async (id, status) => {
-    const response = await fetch(`${apiBaseUrl}/appointments/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
-      credentials: "include",
-      body: JSON.stringify({ status }),
-    });
-    const data = await readApiResponse(response);
-    setRequests((current) => current.map((request) => request.id === id ? mapRequest(data) : request));
+    try {
+      setUpdatingId(id);
+      setError("");
+      const response = await fetch(`${apiBaseUrl}/appointments/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        credentials: "include",
+        body: JSON.stringify({ status: status.toUpperCase() }),
+      });
+      const data = await readApiResponse(response);
+      setRequests((current) => current.map((request) => request.id === id ? mapRequest(data) : request));
+      window.dispatchEvent(new Event("appointments-updated"));
+      return data;
+    } catch (requestError) {
+      setError(requestError.message || "Could not update the appointment request.");
+      throw requestError;
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
-  return { requests, loading, error, updateRequestStatus };
+  return { requests, loading, error, updatingId, updateRequestStatus };
 };
 
 export default useLecturerRequests;

@@ -18,7 +18,7 @@ const formatDate = (date) => {
 
 const Requests = () => {
   const [activeTab, setActiveTab] = useState("All");
-  const { requests, loading, error, updatingId, updateRequestStatus } = useLecturerRequests();
+  const { requests, loading, error, updateRequestStatus } = useLecturerRequests();
 
   const pendingCount = countByStatus(requests, "Pending");
   const filteredRequests =
@@ -107,19 +107,17 @@ const Requests = () => {
                     <div className="flex gap-2">
                       <button
                         type="button"
-                        onClick={() => updateRequestStatus(request.id, "Rejected").catch(() => {})}
-                        disabled={updatingId === request.id}
+                        onClick={() => updateRequestStatus(request.id, "Rejected")}
                         className="rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
                       >
-                        {updatingId === request.id ? "Updating..." : "X Reject"}
+                        X Reject
                       </button>
                       <button
                         type="button"
-                        onClick={() => updateRequestStatus(request.id, "Approved").catch(() => {})}
-                        disabled={updatingId === request.id}
+                        onClick={() => updateRequestStatus(request.id, "Approved")}
                         className="rounded-full border border-emerald-700 bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
                       >
-                        {updatingId === request.id ? "Updating..." : "Approve"}
+                        Approve
                       </button>
                     </div>
                   )}

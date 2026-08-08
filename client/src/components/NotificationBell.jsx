@@ -1,14 +1,8 @@
 
 
-const Notifications = ({ item, onMarkAsRead = () => {}, onAppointmentAction, actionInProgress = false }) => {
+const Notifications = ({ item, onMarkAsRead = () => {} }) => {
   if (!item) return null;
-  const { id, type, title, message, timeAgo, isRead, appointmentId } = item;
-  const canRespond = type === "reminder" && appointmentId && onAppointmentAction;
-
-  const handleAction = async (event, status) => {
-    event.stopPropagation();
-    await onAppointmentAction(appointmentId, status, id);
-  };
+  const { id, type, title, message, timeAgo, isRead } = item;
 
   // 1. Dynamic configuration based on notification types
   const config = {
@@ -71,26 +65,6 @@ const Notifications = ({ item, onMarkAsRead = () => {}, onAppointmentAction, act
         <span className="block text-xs font-medium text-slate-400 mt-2 tracking-wide">
           {timeAgo}
         </span>
-        {canRespond && (
-          <div className="mt-4 flex gap-2">
-            <button
-              type="button"
-              onClick={(event) => handleAction(event, "REJECTED")}
-              disabled={actionInProgress}
-              className="rounded-full border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Reject
-            </button>
-            <button
-              type="button"
-              onClick={(event) => handleAction(event, "APPROVED")}
-              disabled={actionInProgress}
-              className="rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {actionInProgress ? "Updating..." : "Approve"}
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Unread Blueprint Dot Indicator */}

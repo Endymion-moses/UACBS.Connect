@@ -75,7 +75,6 @@ model Appointment {
 
   student         StudentProfile    @relation(fields: [studentId], references: [id], onDelete: Cascade)
   lecturer        LecturerProfile   @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
-  notifications   Notification[]
 
   @@unique([lecturerId, appointmentDate, timeSlot])
 }
@@ -86,14 +85,10 @@ model Notification {
   type      String
   title     String
   message   String
-  appointmentId Int?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-
-  @@index([appointmentId])
 }
 
 model LecturerAvailability {

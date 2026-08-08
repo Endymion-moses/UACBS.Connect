@@ -19,9 +19,7 @@ export const markNotificationRead = async (req, res) => {
   try {
     const notification = await prisma.notification.findFirst({ where: { id: Number(req.params.id), userId: req.user.id } });
     if (!notification) return res.status(404).json({ message: "Notification not found" });
-    const updated = await prisma.notification.update({ where: { id: notification.id }, data: { isRead: true } });
-    const unreadCount = await prisma.notification.count({ where: { userId: req.user.id, isRead: false } });
-    return res.json({ notification: updated, unreadCount });
+    return res.json(await prisma.notification.update({ where: { id: notification.id }, data: { isRead: true } }));
   } catch (error) {
     console.error("Failed to update notification", error);
     return res.status(500).json({ message: "Failed to update notification" });

@@ -1,20 +1,11 @@
 //import React from 'react'
-import { useState, useEffect } from "react";
-import { Link ,useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
+import { useAuth } from '../context/useAuth'
 
 const Sidebar = ({ role = 'student', isOpen = false, onClose = () => {} }) => {
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
 
-
-
-useEffect(() => {
-    // Read the active session data we saved during the login phase
-    const cachedUser = localStorage.getItem("user");
-    if (cachedUser) {
-        setUser(JSON.parse(cachedUser));
-    }
-}, []);
 
 // Helper function to extract initials safely from the user's name
 const getInitials = (name) => {
@@ -26,20 +17,22 @@ const getInitials = (name) => {
 
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    // Optional: Confirm action with user
-    const confirmSignOut = window.confirm("Are you sure you want to sign out?");
-    if (!confirmSignOut) return;
+  const handleSignOut = async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.warn("Logout request failed", error);
+    }
 
-    // Clear saved session keys
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("isLoggedIn");
+    logout();
 
     // Close mobile drawer menu overlay if open
     onClose();
 
-    // Redirect the user back to the login screen route
+    // Redirect to the login screen route
     navigate("/");
   };
   const menuItems = {

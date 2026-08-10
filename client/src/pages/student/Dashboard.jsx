@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { countByStatus, countUpcoming } from '../../services/appointmentServices';
 import DashboardStats from "../../components/DashboardStats";
 import useAppointment from "../../hooks/useAppointment";
+import { useAuth } from "../../context/useAuth";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -17,6 +18,7 @@ const initialsFromName = (name) => name
 
 const StudentDashboard = () => {
   const { appointments } = useAppointment();
+  const { user } = useAuth();
   const [lecturers, setLecturers] = useState([]);
   const [lecturersError, setLecturersError] = useState("");
   const recentAppointments = appointments.slice(0, 4);
@@ -77,11 +79,20 @@ const StudentDashboard = () => {
     },
   ];
 
+  const displayName = user?.fullName?.split(" ")[0] || "Student";
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+  const greeting = getGreeting();
+
   return (
     <div className="p-5 flex flex-col">
       <div className="flex flex-row gap-6 pb-5 items-center justify-between sm:flex-row">
         <div>
-          <h1 className="text-lg font-bold">Good morning, Amina 👋</h1>
+          <h1 className="text-lg font-bold">{greeting}, {displayName} 👋</h1>
           <p className="text-gray-400 text-sm ">Here's an overview of your consultations.</p>
         </div>
 

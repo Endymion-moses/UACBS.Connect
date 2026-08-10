@@ -4,8 +4,10 @@ import { assets } from "../../assets/assets";
 import DashboardStats from "../../components/DashboardStats";
 import { countByStatus, countThisMonth, countUniqueBy } from "../../services/appointmentServices";
 import useLecturerRequests from "../../hooks/useLecturerRequests";
+import { useAuth } from "../../context/useAuth";
 
 const LecturerDashboard = () => {
+  const { user } = useAuth();
   const { requests } = useLecturerRequests();
   const pendingRequests = requests.filter((request) => request.status === "Pending");
   const todaySchedule = requests.filter((request) => request.date === "2026-06-18");
@@ -33,10 +35,19 @@ const LecturerDashboard = () => {
     },
   ];
 
+  const displayName = user?.fullName || "Lecturer";
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+  const greeting = getGreeting();
+
   return (
     <div className="p-5 flex flex-col">
       <div className="pb-5">
-        <h1 className="text-lg font-bold">Good morning, Dr. Nwosu</h1>
+        <h1 className="text-lg font-bold">{greeting}, {displayName}</h1>
         <p className="text-gray-400 text-sm">Your consultation overview</p>
       </div>
 

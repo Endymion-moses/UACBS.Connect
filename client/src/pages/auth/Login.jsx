@@ -2,9 +2,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../../assets/assets.js"
 import { useState } from "react"
+import { useAuth } from "../../context/useAuth"
 
 const Login = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [role, setRole] = useState("student");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -50,8 +52,7 @@ const Login = () => {
                 // 1. Clear out old leftover data from the local storage cache first
                 localStorage.removeItem("user");
                 localStorage.removeItem("profile");
-                localStorage.removeItem("token"); // add this too, for consistency
-
+                localStorage.removeItem("token");
 
                 // 2. Save the fresh logged-in user profile details to local storage
                 localStorage.setItem("user", JSON.stringify(data.user));
@@ -59,6 +60,9 @@ const Login = () => {
                 if (data.profile) {
                     localStorage.setItem("profile", JSON.stringify(data.profile));
                 }
+
+                // 3. Update shared auth state so UI components refresh immediately
+                login({ user: data.user, token: data.token });
 
                 // 3. Extract the real role directly from the database response object
                 // Our database uses UPPERCASE strings ('STUDENT', 'LECTURER', 'ADMIN')

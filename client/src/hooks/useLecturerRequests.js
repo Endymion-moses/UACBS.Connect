@@ -27,6 +27,7 @@ const readApiResponse = async (response) => {
 export const useLecturerRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updatingIds, setUpdatingIds] = useState([]);
   const [error, setError] = useState("");
 
   const loadRequests = useCallback(async () => {
@@ -48,17 +49,26 @@ export const useLecturerRequests = () => {
   useEffect(() => { loadRequests(); }, [loadRequests]);
 
   const updateRequestStatus = async (id, status) => {
-    const response = await fetch(`${apiBaseUrl}/appointments/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
-      credentials: "include",
-      body: JSON.stringify({ status }),
-    });
-    const data = await readApiResponse(response);
-    setRequests((current) => current.map((request) => request.id === id ? mapRequest(data) : request));
+    try {
+      setError("");
+      setUpdatingIds((current) => [...current, id]);
+      const response = await fetch(`${apiBaseUrl}/appointments/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+      const data = await readApiResponse(response);
+      setRequests((current) => current.map((request) => request.id === id ? mapRequest(data) : request));
+      window.dispatchEvent(new Event("notifications-updated"));
+    } catch (requestError) {
+      setError(requestError.message || "Could not update appointment request.");
+    } finally {
+      setUpdatingIds((current) => current.filter((requestId) => requestId !== id));
+    }
   };
 
-  return { requests, loading, error, updateRequestStatus };
+  return { requests, loading, error, updatingIds, updateRequestStatus };
 };
 
 export default useLecturerRequests;

@@ -46,7 +46,12 @@ export const useAppointment = () => {
     }
   }, []);
 
-  useEffect(() => { loadAppointments(); }, [loadAppointments]);
+  useEffect(() => {
+    loadAppointments();
+    const refresh = () => loadAppointments().catch(() => {});
+    window.addEventListener("notifications-updated", refresh);
+    return () => window.removeEventListener("notifications-updated", refresh);
+  }, [loadAppointments]);
 
   const updateAppointmentStatus = async (id, status) => {
     if (status !== "Cancelled") return;

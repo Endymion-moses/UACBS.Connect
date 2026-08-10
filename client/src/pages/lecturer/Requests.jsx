@@ -18,7 +18,7 @@ const formatDate = (date) => {
 
 const Requests = () => {
   const [activeTab, setActiveTab] = useState("All");
-  const { requests, loading, error, updateRequestStatus } = useLecturerRequests();
+  const { requests, loading, error, updatingIds, updateRequestStatus } = useLecturerRequests();
 
   const pendingCount = countByStatus(requests, "Pending");
   const filteredRequests =
@@ -108,16 +108,18 @@ const Requests = () => {
                       <button
                         type="button"
                         onClick={() => updateRequestStatus(request.id, "Rejected")}
-                        className="rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
+                        disabled={updatingIds.includes(request.id)}
+                        className={`rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 ${updatingIds.includes(request.id) ? "cursor-not-allowed opacity-50 hover:bg-white" : ""}`}
                       >
-                        X Reject
+                        {updatingIds.includes(request.id) ? "Rejecting…" : "X Reject"}
                       </button>
                       <button
                         type="button"
                         onClick={() => updateRequestStatus(request.id, "Approved")}
-                        className="rounded-full border border-emerald-700 bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                        disabled={updatingIds.includes(request.id)}
+                        className={`rounded-full border border-emerald-700 bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 ${updatingIds.includes(request.id) ? "cursor-not-allowed opacity-50 hover:bg-emerald-700" : ""}`}
                       >
-                        Approve
+                        {updatingIds.includes(request.id) ? "Approving…" : "Approve"}
                       </button>
                     </div>
                   )}

@@ -1,8 +1,16 @@
-
+import { useState } from 'react';
 
 const Notifications = ({ item, onMarkAsRead = () => {} }) => {
+  const [isOpen, setIsOpen] = useState(false);
   if (!item) return null;
   const { id, type, title, message, timeAgo, isRead } = item;
+
+  const handleClick = () => {
+    if (!isOpen) {
+      if (!isRead) onMarkAsRead(id);
+      setIsOpen(true);
+    }
+  };
 
   // 1. Dynamic configuration based on notification types
   const config = {
@@ -44,7 +52,7 @@ const Notifications = ({ item, onMarkAsRead = () => {} }) => {
 
   return (
     <div
-      onClick={() => !isRead && onMarkAsRead(id)}
+      onClick={handleClick}
       className={`group flex items-start gap-4 p-5 bg-white border border-slate-100 rounded-2xl transition-all duration-200 shadow-sm ${
         !isRead ? 'cursor-pointer hover:bg-gray-400' : 'opacity-85'
       }`}
@@ -59,9 +67,15 @@ const Notifications = ({ item, onMarkAsRead = () => {} }) => {
         <h4 className="font-semibold text-slate-800 text-sm tracking-wide leading-tight">
           {title}
         </h4>
-        <p className="text-slate-500 text-sm mt-1 leading-normal pr-4">
-          {message}
-        </p>
+        {isOpen ? (
+          <p className="text-slate-500 text-sm mt-1 leading-normal pr-4">
+            {message}
+          </p>
+        ) : (
+          <p className="text-slate-400 text-sm mt-1 leading-normal pr-4">
+            Click to view details
+          </p>
+        )}
         <span className="block text-xs font-medium text-slate-400 mt-2 tracking-wide">
           {timeAgo}
         </span>

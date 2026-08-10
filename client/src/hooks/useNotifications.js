@@ -44,8 +44,7 @@ export const useNotifications = () => {
       credentials: "include",
     });
     if (!response.ok) throw new Error("Could not mark notification as read.");
-    setNotifications((current) => current.map((item) => item.id === id ? { ...item, isRead: true } : item));
-    setUnreadCount((count) => Math.max(0, count - 1));
+    await loadNotifications();
     window.dispatchEvent(new Event("notifications-updated"));
   };
 

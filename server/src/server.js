@@ -24,7 +24,7 @@ app.use(cookieParser()); // 2. Activate cookie parsing before processing routes
 
 app.use(cors({
   origin: [
-    "https://uacbs-connect-s26l.vercel.app",// Your live Vercel frontend
+    "https://uacbs-connect-s26l.vercel.app",
     "http://localhost:5173",
   ],
   credentials: true,

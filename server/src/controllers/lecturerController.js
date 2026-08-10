@@ -21,42 +21,60 @@ const getCurrentAvailabilitySlot = () => {
 };
 
 export const getAllLecturers = async (req, res) => {
-    try {
-        const currentSlot = getCurrentAvailabilitySlot();
-        const lecturers = await prisma.lecturerProfile.findMany({
-            select: {
-                id: true,
-                department: true,
-                specialization: true,
-                officeLocation: true,
-                user: {
-                    select: {
-                        fullName: true,
-                    },
-                },
-                availability: currentSlot.timeSlot ? {
-                    where: {
-                        dayOfWeek: currentSlot.dayOfWeek,
-                        timeSlot: currentSlot.timeSlot,
-                        isAvailable: true,
-                    },
-                    select: { id: true },
-                } : false,
-            },
-            orderBy: {
-                user: {
-                    fullName: "asc",
-                },
-            },
-        });
+  try {
+    const currentSlot = getCurrentAvailabilitySlot();
 
-        return res.status(200).json(lecturers.map(({ availability, ...lecturer }) => ({
-            ...lecturer,
-            isOnline: availability.length > 0,
-        })));
+    // 1. If it's a weekend or outside 8 AM - 4 PM, skip availability entirely
+    if (!currentSlot || !currentSlot.timeSlot) {
+      const lecturers = await prisma.lecturerProfile.findMany({
+        select: {
+          id: true,
+          department: true,
+          specialization: true,
+          officeLocation: true,
+          user: { select: { fullName: true } },
+        },
+        orderBy: { user: { fullName: "asc" } },
+      });
 
-
-    } catch (error) {
-       return res.status(500).json({message :"Server database error "});
+      // Outside working hours, everyone is safely marked offline
+      return res.status(200).json(
+        lecturers.map((lecturer) => ({ ...lecturer, isOnline: false }))
+      );
     }
-}
+
+    // 2. If inside working hours, execute the full availability query
+    const lecturers = await prisma.lecturerProfile.findMany({
+      select: {
+        id: true,
+        department: true,
+        specialization: true,
+        officeLocation: true,
+        user: { select: { fullName: true } },
+        availability: {
+          where: {
+            dayOfWeek: currentSlot.dayOfWeek,
+            timeSlot: currentSlot.timeSlot,
+            isAvailable: true,
+          },
+          select: { id: true },
+        },
+      },
+      orderBy: { user: { fullName: "asc" } },
+    });
+
+    // Format output for active operational hours
+    return res.status(200).json(
+      lecturers.map(({ availability, ...lecturer }) => ({
+        ...lecturer,
+        isOnline: Array.isArray(availability) && availability.length > 0,
+      }))
+    );
+
+  } catch (error) {
+    // This logs the exact runtime error message straight into your Render dashboard logs
+    console.error("CRITICAL GET_ALL_LECTURERS EXCEPTION:", error);
+
+    return res.status(500).json({ message: "Server database error" });
+  }
+};

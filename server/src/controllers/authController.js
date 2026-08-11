@@ -28,11 +28,8 @@ const createPasswordTransporter = async () => {
     });
   }
 
-  if (process.env.NODE_ENV === "production") {
-    return null;
-  }
-
   const testAccount = await nodemailer.createTestAccount();
+  console.warn("Email provider is not configured. Using Nodemailer test SMTP account for password reset debugging.");
   return nodemailer.createTransport({
     host: testAccount.smtp.host,
     port: testAccount.smtp.port,
@@ -46,9 +43,6 @@ const createPasswordTransporter = async () => {
 
 const sendPasswordResetEmail = async (user, resetUrl) => {
   const transporter = await createPasswordTransporter();
-  if (!transporter) {
-    throw new Error("Email provider is not configured. Set EMAIL_HOST, EMAIL_PORT, EMAIL_USER, and EMAIL_PASS.");
-  }
 
   const from = process.env.EMAIL_FROM || process.env.EMAIL_USER || "no-reply@uacbs.local";
   const subject = "Reset your UACBS password";
@@ -71,7 +65,12 @@ const sendPasswordResetEmail = async (user, resetUrl) => {
     html,
   });
 
-  return info;
+  const previewUrl = nodemailer.getTestMessageUrl(info);
+  if (previewUrl) {
+    console.warn("Password reset email preview URL:", previewUrl);
+  }
+
+  return { info, previewUrl };
 };
 
 //register
@@ -293,17 +292,26 @@ const forgotPassword = async (req, res) => {
     }
 
     const resetToken = createPasswordResetToken(user.id);
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || "http://localhost:5173";
     const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
 
+    let emailResult;
     try {
-      await sendPasswordResetEmail(user, resetUrl);
+      emailResult = await sendPasswordResetEmail(user, resetUrl);
     } catch (emailError) {
       console.error("Password reset email failed:", emailError);
       return res.status(500).json({ message: "Unable to send password reset email. Check server email configuration." });
     }
 
-    return res.status(200).json({ message: "If an account exists for this email, password reset instructions will be sent." });
+    const successResponse = {
+      message: "If an account exists for this email, password reset instructions will be sent.",
+    };
+    if (emailResult?.previewUrl) {
+      successResponse.previewUrl = emailResult.previewUrl;
+      successResponse.debug = "A preview URL has been generated for the password reset email.";
+    }
+
+    return res.status(200).json(successResponse);
   } catch (error) {
     return res.status(500).json({ error: error.message || "Internal server error" });
   }

@@ -24,7 +24,7 @@ const register = async (req, res) => {
         }
 
         // 3. Phone Number Validation & Formatting for Student and Lecturer
-            
+
         let formattedPhone = "";
         if (role === 'STUDENT' || role === 'LECTURER') {
             if (!profileInfo?.phoneNumber) {

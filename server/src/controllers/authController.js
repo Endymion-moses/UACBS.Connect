@@ -1,7 +1,78 @@
 import { prisma } from "../config/database.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 import { generateToken } from "../utils/generateToken.js";
 
+const getPasswordResetSecret = () => process.env.JWT_RESET_PASSWORD_SECRET || process.env.JWT_SECRET || "fallback_secret_key_123";
+
+const createPasswordResetToken = (userId) => {
+  return jwt.sign({ id: userId, type: "RESET_PASSWORD" }, getPasswordResetSecret(), {
+    expiresIn: process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "1h",
+  });
+};
+
+const createPasswordTransporter = async () => {
+  const host = process.env.EMAIL_HOST;
+  const port = Number(process.env.EMAIL_PORT || 0);
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
+  const secure = process.env.EMAIL_SECURE === "true";
+
+  if (host && port && user && pass) {
+    return nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+    });
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    return null;
+  }
+
+  const testAccount = await nodemailer.createTestAccount();
+  return nodemailer.createTransport({
+    host: testAccount.smtp.host,
+    port: testAccount.smtp.port,
+    secure: testAccount.smtp.secure,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass,
+    },
+  });
+};
+
+const sendPasswordResetEmail = async (user, resetUrl) => {
+  const transporter = await createPasswordTransporter();
+  if (!transporter) {
+    throw new Error("Email provider is not configured. Set EMAIL_HOST, EMAIL_PORT, EMAIL_USER, and EMAIL_PASS.");
+  }
+
+  const from = process.env.EMAIL_FROM || process.env.EMAIL_USER || "no-reply@uacbs.local";
+  const subject = "Reset your UACBS password";
+  const text = `Hello ${user.fullName},\n\n` +
+    `A password reset was requested for your account. If you did not request this, you can ignore this email.\n\n` +
+    `Reset your password here: ${resetUrl}\n\n` +
+    `This link expires in ${process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "1 hour"}.\n\n` +
+    `Thanks,\nUACBS Team`;
+  const html = `<p>Hello ${user.fullName},</p>` +
+    `<p>A password reset was requested for your account. If you did not request this, you can ignore this email.</p>` +
+    `<p><a href="${resetUrl}" target="_blank" rel="noopener">Reset your password</a></p>` +
+    `<p>This link expires in ${process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "1 hour"}.</p>` +
+    `<p>Thanks,<br/>UACBS Team</p>`;
+
+  const info = await transporter.sendMail({
+    from,
+    to: user.email,
+    subject,
+    text,
+    html,
+  });
+
+  return info;
+};
 
 //register
 const register = async (req, res) => {
@@ -221,10 +292,75 @@ const forgotPassword = async (req, res) => {
       return res.status(200).json({ message: "If an account exists for this email, password reset instructions will be sent." });
     }
 
+    const resetToken = createPasswordResetToken(user.id);
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
+
+    try {
+      await sendPasswordResetEmail(user, resetUrl);
+    } catch (emailError) {
+      console.error("Password reset email failed:", emailError);
+      return res.status(500).json({ message: "Unable to send password reset email. Check server email configuration." });
+    }
+
     return res.status(200).json({ message: "If an account exists for this email, password reset instructions will be sent." });
   } catch (error) {
     return res.status(500).json({ error: error.message || "Internal server error" });
   }
 };
 
-export { register ,login, logout, forgotPassword };
+const verifyPasswordResetToken = (token) => {
+  return jwt.verify(token, getPasswordResetSecret());
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token, password, confirmPassword } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Reset token is required." });
+    }
+
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ message: "Password and confirmation are required." });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters." });
+    }
+
+    let decoded;
+    try {
+      decoded = verifyPasswordResetToken(token);
+    } catch (error) {
+      return res.status(400).json({ message: "Reset token is invalid or has expired." });
+    }
+
+    if (!decoded?.id || decoded.type !== "RESET_PASSWORD") {
+      return res.status(400).json({ message: "Reset token is invalid." });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword }
+    });
+
+    return res.status(200).json({ message: "Password reset successfully. You can now sign in with your new password." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || "Internal server error" });
+  }
+};
+
+export { register ,login, logout, forgotPassword, resetPassword };

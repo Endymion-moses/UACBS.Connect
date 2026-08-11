@@ -170,7 +170,7 @@ const Login = () => {
                                 <input className=" border rounded p-2 text-gray-700 " type="checkbox" />
                                 <label className=" text-gray-500 text-lg mb-2">Remember me</label>
                             </div>
-                            <Link className="text-blue-500 hover:text-blue-800">Forgot Password?</Link>
+                            <Link to="/forgot-password" className="text-blue-500 hover:text-blue-800">Forgot Password?</Link>
                         </div>
 
                         <button type="submit" disabled={isLoading} className="bg-blue-900 w-full rounded-xl p-3 text-white font-bold disabled:opacity-50">

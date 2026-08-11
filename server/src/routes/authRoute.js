@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, logout } from "../controllers/authController.js";
+import { register, login, logout, forgotPassword } from "../controllers/authController.js";
 import { verifyToken } from "../middlewares/verifyToken.js"; // 👈 Import the guard
 
 const router = express.Router();
@@ -8,6 +8,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
+router.post("/forgot-password", forgotPassword);
 
 // Protected Route (Only logged-in users with a valid cookie can pass)
 // Notice how `verifyToken` is placed right in the MIDDLE of the route definition!

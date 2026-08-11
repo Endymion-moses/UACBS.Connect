@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/Login";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 
 import StudentLayout from "../layouts/StudentLayout";
 import LecturerLayout from "../layouts/LecturerLayout";
@@ -34,6 +35,7 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register/>}/>
+      <Route path="/forgot-password" element={<ForgotPassword/>}/>
 
       <Route path="/student" element={<StudentLayout />}>
         <Route index element={<StudentDashboard />} />

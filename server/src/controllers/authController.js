@@ -6,6 +6,8 @@ import { generateToken } from "../utils/generateToken.js";
 
 const getPasswordResetSecret = () => process.env.JWT_RESET_PASSWORD_SECRET || process.env.JWT_SECRET || "fallback_secret_key_123";
 
+
+//forgot password 
 const createPasswordResetToken = (userId) => {
   return jwt.sign({ id: userId, type: "RESET_PASSWORD" }, getPasswordResetSecret(), {
     expiresIn: process.env.JWT_PASSWORD_RESET_EXPIRES_IN || "1h",

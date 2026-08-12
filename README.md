@@ -135,14 +135,3 @@ The backend depends on environment variables in `server/.env` or the environment
 - Lecturer availability is seeded with default slots if none exist yet.
 - Profile updates support role-specific profile data plus optional password changes.
 
-## Suggested improvements
-
-- Add explicit API documentation with request/response examples
-- Add role-based route guards on the frontend
-- Add admin management APIs for departments and reports
-- Add tests for backend controllers and frontend behavior
-- Improve phone validation to support more international formats
-
-## Summary
-
-UACBS.Connect is a university campus appointment booking app that enables students, lecturers, and admins to manage schedules and communication. It is implemented as a React frontend with a Node/Express backend and a PostgreSQL database through Prisma.

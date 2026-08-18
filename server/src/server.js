@@ -9,6 +9,7 @@ import availabilityRoute from "./routes/availabilityRoutes.js";
 import { connectDB, disconnectDB } from "./config/database.js";
 import appointmentRoute from "./routes/appointmentRoutes.js";
 import notificationRoute from "./routes/notificationRoutes.js";
+import adminRoute from "./routes/adminRoutes.js";
 
 config();
 
@@ -39,6 +40,7 @@ app.use("/lecturer", lecturerRoute);
 app.use("/lecturer", availabilityRoute);
 app.use("/appointments", appointmentRoute);
 app.use("/notifications", notificationRoute);
+app.use("/admin", adminRoute);
 
 
 

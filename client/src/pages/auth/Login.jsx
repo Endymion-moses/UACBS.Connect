@@ -92,7 +92,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex md:flex-row min-h-screen">
+        <div className="flex min-h-screen md:flex-row">
             <div className = "hidden md:flex w-full md:w-1/2 bg-blue-900 flex-col mx-auto px-10">
                 <div className="flex gap-2 p-5">
                     <img src={assets.cap_icon} alt="" className="w-15 h-15" />
@@ -122,19 +122,19 @@ const Login = () => {
                 <p className="text-gray-400 pt-15 text-sm p-5">©2026 University Academic Consultation Booking System</p>
             </div>
 
-            <div className = "w-full md:w-1/2 flex flex-col items-center justify-center bg-gray-100">
-                <div>
+            <div className = "flex w-full flex-col items-center justify-center bg-gray-100 px-4 py-8 sm:px-6 md:w-1/2 md:px-10">
+                <div className="w-full max-w-md">
                     <div>
-                        <div className="flex gap-3">
-                            <img src={assets.cap_icon} alt="" className="w-15 h-15 md:hidden" />
-                            <div className="flex flex-col">
-                                <h2 className="text-4xl font-bold text-black-800">Welcome back</h2>
-                                <p className="text-gray-600 text-lg">Sign in to your account to continue</p>
+                        <div className="flex items-center gap-3">
+                            <img src={assets.cap_icon} alt="" className="h-12 w-12 shrink-0 md:hidden" />
+                            <div className="min-w-0 flex flex-col">
+                                <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Welcome back</h2>
+                                <p className="text-base text-gray-600 sm:text-lg">Sign in to your account to continue</p>
                             </div>
                         </div>
-                        <div className = "flex gap-4 pt-5 pb-5">
+                        <div className = "flex gap-1 overflow-x-auto py-5 sm:gap-4">
                             {["student", "lecturer", "admin"].map((r) => (
-                                <button key={r} onClick={() => setRole(r)} className={`w-1/3 py-2 text-sm font-medium ${ role === r ? "rounded-xl border border-white bg-white" : "text-gray-500" }`} >
+                                <button key={r} onClick={() => setRole(r)} className={`min-w-0 flex-1 whitespace-nowrap py-2 text-sm font-medium ${ role === r ? "rounded-xl border border-white bg-white" : "text-gray-500" }`} >
                                     {r.charAt(0).toUpperCase() + r.slice(1)}
                                 </button>
                             ))}
@@ -165,10 +165,10 @@ const Login = () => {
                         value={password} onChange={(e) => setPassword(e.target.value)}
                         className="shadow appearance-none border border-white rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-white" />
 
-                        <div className= "flex justify-between items-center my-4">
+                        <div className= "my-4 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2">
                                 <input className=" border rounded p-2 text-gray-700 " type="checkbox" />
-                                <label className=" text-gray-500 text-lg mb-2">Remember me</label>
+                                <label className="text-gray-500">Remember me</label>
                             </div>
                             <Link to="/forgot-password" className="text-blue-500 hover:text-blue-800">Forgot Password?</Link>
                         </div>
@@ -177,7 +177,7 @@ const Login = () => {
                             {isLoading ? "Signing in..." : "Sign in"}
                         </button>
 
-                        <div className="flex gap-1 p-5 items-center">
+                        <div className="flex flex-wrap items-center gap-1 px-1 pt-5">
                             <p className="text-gray-700 text-sm">Dont have an account?</p>
                             <Link to = "/register" className="text-blue-500 hover:text-blue-800">Create account</Link>
                         </div>

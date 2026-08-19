@@ -114,8 +114,8 @@ const Availability = () => {
   const availableCount = Object.values(availability).filter(Boolean).length;
 
   return (
-    <div className="p-6 flex flex-col">
-      <div className="flex justify-between w-full gap-4 p-3 pb-6">
+    <div className="flex min-w-0 flex-col">
+      <div className="flex w-full flex-col gap-3 pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-xl font-bold">My Availability</h2>
           <p className="text-sm text-gray-400">{availableCount} slots available this week</p>
@@ -124,7 +124,7 @@ const Availability = () => {
           type="button"
           onClick={saveAvailability}
           disabled={loading || saving || Boolean(error && !Object.keys(availability).length)}
-          className="p-2 bg-blue-900 text-white rounded-lg text-sm disabled:opacity-50"
+          className="w-full rounded-lg bg-blue-900 p-3 text-sm text-white disabled:opacity-50 sm:w-auto sm:p-2"
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
@@ -133,8 +133,8 @@ const Availability = () => {
       {error && <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       {message && <p className="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-700">{message}</p>}
 
-      <div className="overflow-x-auto rounded-xl border border-gray-300 bg-white p-4">
-        <div className="grid min-w-[700px] grid-cols-6 gap-2 items-center">
+      <div className="overflow-x-auto rounded-xl border border-gray-300 bg-white p-3 sm:p-4">
+        <div className="grid min-w-175 grid-cols-6 items-center gap-2">
           <div />
           {days.map((day) => <div key={day} className="text-center text-sm font-semibold">{day.slice(0, 3)}</div>)}
           {times.map(({ value, label }) => (

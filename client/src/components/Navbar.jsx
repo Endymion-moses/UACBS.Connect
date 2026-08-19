@@ -21,7 +21,7 @@ const getInitials = (name) => {
 };
   return (
 
-    <div className='flex ml-auto gap-5 items-center'>
+    <div className='ml-auto flex items-center gap-4 sm:gap-5'>
         <Link to={notificationsPath} className='relative cursor-pointer' aria-label={`${unreadCount} unread notifications`}>
           <img src={assets.notification_icon} alt="notifications" className='h-6 w-6'/>
           {unreadCount > 0 && <span className='absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold

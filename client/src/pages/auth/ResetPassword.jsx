@@ -59,9 +59,9 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg">
-        <h1 className="text-3xl font-bold text-slate-900 mb-4">Reset Password</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-lg sm:rounded-3xl sm:p-8">
+        <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl">Reset Password</h1>
         <p className="text-sm text-slate-500 mb-6">
           Enter your new password below and submit to complete the reset.
         </p>

@@ -31,3 +31,19 @@ export const getDashboardOverview = async (req, res) => {
     return res.status(500).json({ message: "Could not load dashboard data" });
   }
 };
+
+export const getUsers = async (req, res) => {
+  try {
+    if (req.user.role !== "ADMIN") return res.status(403).json({ message: "Only administrators can view system users" });
+
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, fullName: true, email: true, role: true, createdAt: true },
+    });
+
+    return res.json({ users });
+  } catch (error) {
+    console.error("Failed to load system users", error);
+    return res.status(500).json({ message: "Could not load system users" });
+  }
+};

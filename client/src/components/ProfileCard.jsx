@@ -115,19 +115,19 @@ const ProfileCard = ({ role = 'student', initialData }) => {
 
     return (
         <div>
-            <div className='flex flex-col pl-33 pb-5'>
+            <div className='flex flex-col pb-5 sm:pl-8 md:pl-16 lg:pl-33'>
                 <h1 className='font-bold text-2xl'>My Profile</h1>
                 <p className='text-gray-400'>Manage your personal information</p>
             </div>
 
-            <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden font-sans text-slate-700">
-                <div className="bg-blue-900 h-32 relative px-8 flex items-end">
-                    <div className="absolute -bottom-6 left-8 w-16 h-16 bg-blue-950 border-4 border-white text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-sm select-none">
+            <div className="mx-auto max-w-xl overflow-hidden rounded-2xl border border-slate-100 bg-white font-sans text-slate-700 shadow-sm">
+                <div className="relative flex h-28 items-end bg-blue-900 px-5 sm:h-32 sm:px-8">
+                    <div className="absolute -bottom-6 left-5 flex h-16 w-16 items-center justify-center rounded-2xl border-4 border-white bg-blue-950 text-xl font-bold text-white shadow-sm select-none sm:left-8">
                         {getInitials(formData.fullName)}
                     </div>
                 </div>
 
-                <div className="pt-8 px-8 pb-4">
+                <div className="px-5 pb-4 pt-8 sm:px-8">
                     <h2 className="text-xl font-bold text-slate-800 leading-tight">
                         {formData.fullName || 'User Profile'}
                     </h2>
@@ -137,7 +137,7 @@ const ProfileCard = ({ role = 'student', initialData }) => {
                 </div>
 
                 {message.text && (
-                    <div className={`mx-8 p-4 rounded-xl text-sm border ${
+                    <div className={`mx-5 rounded-xl border p-4 text-sm sm:mx-8 ${
                         message.type === 'success'
                             ? 'bg-green-50 border-green-200 text-green-700'
                             : 'bg-red-50 border-red-200 text-red-700'
@@ -146,8 +146,8 @@ const ProfileCard = ({ role = 'student', initialData }) => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <form onSubmit={handleSubmit} className="space-y-5 p-5 sm:space-y-6 sm:p-8">
+                    <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2">
                         <div>
                             <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Full Name</label>
                             <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
@@ -196,8 +196,8 @@ const ProfileCard = ({ role = 'student', initialData }) => {
                         <input type="password" name="newPassword" value={formData.newPassword} onChange={handleChange} placeholder="Leave blank to keep current password" className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-blue-900 shadow-sm" />
                     </div>
 
-                    <div className="flex justify-end">
-                        <button type="submit" disabled={isLoading} className="inline-flex items-center justify-center rounded-2xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                    <div className="flex justify-stretch sm:justify-end">
+                        <button type="submit" disabled={isLoading} className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
                             {isLoading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>

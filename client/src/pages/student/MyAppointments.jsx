@@ -76,12 +76,12 @@ export default function AppointmentDashboard() {
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
               <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex gap-4">
+                <div className="min-w-0 flex gap-3 sm:gap-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-900 font-bold text-white">
                     {appointment.initials}
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <h2 className="font-semibold text-slate-900">{appointment.name}</h2>
                     <p className="text-sm text-slate-500">{appointment.task}</p>
                     <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-400">

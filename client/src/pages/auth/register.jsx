@@ -122,8 +122,8 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-lg rounded-[28px] bg-white border border-slate-200 shadow-xl p-8">
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-3 py-5 sm:px-4 sm:py-8">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:rounded-[28px] sm:p-8">
         <h1 className="text-2xl font-semibold text-slate-900 mb-4">Create an account</h1>
         <p className="mb-6 text-slate-600 text-sm">
           Register for the academic consultation booking system.

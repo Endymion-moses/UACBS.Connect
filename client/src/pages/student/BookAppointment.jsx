@@ -100,14 +100,14 @@ export default function ConsultationBooking() {
  
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-slate-50 min-h-screen font-sans text-slate-700">
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div className="mx-auto min-h-full max-w-6xl bg-slate-50 p-0 font-sans text-slate-700 sm:p-2">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 items-start gap-4 sm:gap-6 md:grid-cols-2">
 
         {/* ================= LEFT COLUMN ================= */}
         <div className="space-y-6">
 
           {/* 1. SELECT LECTURER */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">1 — SELECT LECTURER</h2>
             <div className="space-y-3">
               {lecturersError && <p className="text-sm text-rose-600">{lecturersError}</p>}
@@ -121,17 +121,17 @@ export default function ConsultationBooking() {
                     onClick={() => {
                       selectLecturer(lecturer);
                     }}
-                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl border p-3 text-left transition-all sm:p-4 ${
                       isSelected ? 'border-slate-800 bg-white ring-1 ring-slate-800' : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="min-w-0 flex items-center gap-3 sm:gap-4">
                       <div className="w-10 h-10 rounded-full bg-blue-900 text-white font-bold text-xs flex items-center justify-center">
                         {lecturer.initials}
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-slate-800 text-sm">{lecturer.name}</h4>
-                        <p className="text-xs text-slate-400">{lecturer.department}</p>
+                      <div className="min-w-0">
+                        <h4 className="truncate font-semibold text-slate-800 text-sm">{lecturer.name}</h4>
+                        <p className="truncate text-xs text-slate-400">{lecturer.department}</p>
                       </div>
                     </div>
                     <span
@@ -145,7 +145,7 @@ export default function ConsultationBooking() {
           </div>
 
           {/* 2. SELECT DATE (Simplified View placeholder matching the calendar block position) */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">2 — SELECT DATE</h2>
             <div className="border border-slate-200 rounded-xl p-4 text-center">
               <p className="text-sm font-medium mb-2">June 2026</p>
@@ -156,7 +156,7 @@ export default function ConsultationBooking() {
                   setSelectedDate(e.target.value);
                   setSelectedTime('');
                 }}
-                className="p-2 border rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-800"
+                className="w-full max-w-65 border p-2 text-sm text-slate-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-800"
               />
             </div>
           </div>
@@ -167,13 +167,13 @@ export default function ConsultationBooking() {
         <div className="space-y-6">
 
           {/* 3. SELECT TIME */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm min-h-[140px] flex flex-col justify-center">
+          <div className="flex min-h-35 flex-col justify-center rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4 self-start">3 — SELECT TIME</h2>
 
             {!selectedDate || !selectedLecturer ? (
               <p className="text-slate-400 text-sm text-center py-4">Pick a lecturer and date first</p>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
                 {availableTimes.length === 0 ? (
                   <p className="col-span-2 text-center text-sm text-slate-400">No available time slots for this date.</p>
                 ) : availableTimes.map((time) => (
@@ -197,7 +197,7 @@ export default function ConsultationBooking() {
           {submitError && <p className="rounded-xl bg-rose-50 p-3 text-sm text-rose-600">{submitError}</p>}
 
           {/* 4. REASON */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">4 — REASON</h2>
             <div className="relative">
               <textarea

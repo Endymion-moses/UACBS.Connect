@@ -45,7 +45,7 @@ const LecturerDashboard = () => {
   const greeting = getGreeting();
 
   return (
-    <div className="p-5 flex flex-col">
+    <div className="flex min-w-0 flex-col">
       <div className="pb-5">
         <h1 className="text-lg font-bold">{greeting}, {displayName}</h1>
         <p className="text-gray-400 text-sm">Your consultation overview</p>
@@ -70,9 +70,9 @@ const LecturerDashboard = () => {
                 pendingRequests.map((request) => (
                   <div
                     key={request.id}
-                    className="rounded-3xl border border-slate-200 hover:bg-gray-100 p-4 flex items-center justify-between gap-4"
+                    className="flex flex-col gap-3 rounded-3xl border border-slate-200 p-4 hover:bg-gray-100 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                   >
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-semibold text-slate-900">{request.student}</p>
                       <p className="text-sm text-slate-500">{request.topic}</p>
                       <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
@@ -80,7 +80,7 @@ const LecturerDashboard = () => {
                         <span>{request.time}</span>
                       </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-600">
+                    <span className="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
                       {request.status}
                     </span>
                   </div>

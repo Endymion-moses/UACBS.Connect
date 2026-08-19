@@ -73,7 +73,7 @@ const getInitials = (name) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed md:sticky md:top-0 w-70 h-screen overflow-y-auto bg-blue-900 text-white px-6 py-8 z-40 transition-transform duration-300 md:translate-x-0 ${
+      <aside className={`fixed md:sticky md:top-0 h-screen w-[85vw] max-w-70 overflow-y-auto bg-blue-900 px-5 py-6 text-white z-40 transition-transform duration-300 md:w-70 md:max-w-none md:px-6 md:py-8 md:translate-x-0 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } md:block`}>
         <div className="mb-8 flex items-center justify-between">
@@ -115,9 +115,9 @@ const getInitials = (name) => {
 
         <hr className='w-full text-gray-400 '/>
 
-        <div className='pt-10 flex flex-col gap-4'>
+        <div className='flex flex-col gap-4 pt-8'>
     {/* User Profile Info block */}
-    <div className="flex items-center gap-3 px-2 pt-20">
+    <div className="flex items-center gap-3 px-2 pt-8 md:pt-20">
 
         {/* Dynamic Avatar Initials Circle */}
         <div className="w-10 h-10 rounded-full bg-white text-blue-900 font-bold text-sm flex items-center justify-center shrink-0 shadow-sm select-none">
